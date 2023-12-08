@@ -30,16 +30,12 @@ exports.app.get('/videos', (req, res) => {
 });
 exports.app.get('/videos/:id', (req, res) => {
     const id = +req.params.id;
-    if (!id) {
-        res.sendStatus(400);
-        return;
-    }
     const requestedVideo = videosDb.find(i => i.id === id);
     if (!requestedVideo) {
         res.sendStatus(404);
         return;
     }
-    res.send(videosDb);
+    res.send(requestedVideo);
 });
 exports.app.post('/videos', (req, res) => {
     let { title, author, availableResolutions } = req.body;

@@ -61,11 +61,6 @@ app.get('/videos', (req: Request, res: Response) => {
 app.get('/videos/:id', (req: PostVideoByIdType<{ id: string }>, res: Response) => {
     const id = +req.params.id
 
-    if (!id) {
-        res.sendStatus(400);
-        return;
-    }
-
     const requestedVideo = videosDb.find(i => i.id === id);
 
     if (!requestedVideo) {
@@ -73,7 +68,7 @@ app.get('/videos/:id', (req: PostVideoByIdType<{ id: string }>, res: Response) =
         return;
     }
 
-    res.send(videosDb);
+    res.send(requestedVideo);
 });
 
 app.post('/videos', (req: PostVideoType<PostVideItemType>, res: Response) => {
