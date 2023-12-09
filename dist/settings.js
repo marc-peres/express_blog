@@ -8,6 +8,12 @@ const express_1 = __importDefault(require("express"));
 exports.app = (0, express_1.default)();
 exports.app.use(express_1.default.json());
 const AvailableResolutionsType = ['P144', 'P240', 'P360', 'P480', 'P720', 'P1080', 'P1440', 'P2160'];
+const isISOString = (val) => {
+    if (!val || typeof val !== "string")
+        return false;
+    const d = new Date(val);
+    return !Number.isNaN(d.valueOf()) && d.toISOString() === val;
+};
 exports.videosDb = [];
 exports.HTTP_STATUSES = {
     OK_200: 200,
@@ -48,7 +54,7 @@ exports.app.post('/videos', (req, res) => {
             field: 'author'
         };
     }
-    if (availableResolutions && Array.isArray(availableResolutions)) {
+    if (availableResolutions && Array.isArray(availableResolutions) && availableResolutions.length) {
         for (let i = 0; i < availableResolutions.length; i++) {
             if (!AvailableResolutionsType.includes(availableResolutions[i])) {
                 errors.errorsMessages[errors.errorsMessages.length] = {
@@ -98,7 +104,7 @@ exports.app.put('/videos/:id', (req, res) => {
             field: 'author'
         };
     }
-    if (availableResolutions && Array.isArray(availableResolutions)) {
+    if (availableResolutions && Array.isArray(availableResolutions) && availableResolutions.length) {
         for (let i = 0; i < availableResolutions.length; i++) {
             if (!AvailableResolutionsType.includes(availableResolutions[i])) {
                 errors.errorsMessages[errors.errorsMessages.length] = {
@@ -126,6 +132,13 @@ exports.app.put('/videos/:id', (req, res) => {
             field: 'minAgeRestriction'
         };
     }
+    const isPublicationDateValid = isISOString(publicationDate);
+    if (!isPublicationDateValid && publicationDate !== undefined) {
+        errors.errorsMessages[errors.errorsMessages.length] = {
+            message: 'invalid publicationDate',
+            field: 'publicationDate'
+        };
+    }
     if (errors.errorsMessages.length) {
         res.status(exports.HTTP_STATUSES.BAD_REQUEST_400).send(errors);
         return;
@@ -142,14 +155,10 @@ exports.app.put('/videos/:id', (req, res) => {
         res.sendStatus(exports.HTTP_STATUSES.NOT_FOUND_404);
         return;
     }
-    const parsedDate = new Date(Date.parse(publicationDate));
-    if (!publicationDate || !parsedDate || parsedDate.toISOString() !== publicationDate) {
-        publicationDate = new Date().toISOString();
-    }
     exports.videosDb[indexOfRequestedVideo].title = title;
     exports.videosDb[indexOfRequestedVideo].author = author;
     exports.videosDb[indexOfRequestedVideo].availableResolutions = availableResolutions;
-    exports.videosDb[indexOfRequestedVideo].publicationDate = publicationDate;
+    exports.videosDb[indexOfRequestedVideo].publicationDate = publicationDate || exports.videosDb[indexOfRequestedVideo].publicationDate;
     exports.videosDb[indexOfRequestedVideo].canBeDownloaded = canBeDownloaded;
     exports.videosDb[indexOfRequestedVideo].minAgeRestriction = minAgeRestriction || null;
     res.sendStatus(exports.HTTP_STATUSES.NO_CONTENT_204);

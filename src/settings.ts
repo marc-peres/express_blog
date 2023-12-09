@@ -6,6 +6,11 @@ app.use(express.json());
 
 const AvailableResolutionsType =  ['P144', 'P240', 'P360', 'P480', 'P720', 'P1080', 'P1440', 'P2160']
 
+const isISOString = (val: unknown) => {
+    if (!val || typeof val !== "string") return false
+    const d = new Date(val);
+    return !Number.isNaN(d.valueOf()) && d.toISOString() === val;
+};
 
 type VideosDbType =  {
     id: number;
@@ -95,7 +100,7 @@ app.post('/videos', (req: PostVideoType<PostVideItemType>, res: Response) => {
         }
     }
 
-    if (availableResolutions && Array.isArray(availableResolutions)) {
+    if (availableResolutions && Array.isArray(availableResolutions) && availableResolutions.length) {
         for (let i = 0; i < availableResolutions.length; i++) {
             if (!AvailableResolutionsType.includes(availableResolutions[i])) {
                 errors.errorsMessages[errors.errorsMessages.length] = {
@@ -135,7 +140,6 @@ app.post('/videos', (req: PostVideoType<PostVideItemType>, res: Response) => {
 
 app.put('/videos/:id', (req: PutVideoType<IdParamType, PutVideoItemType>, res: Response) => {
     let {title, author, availableResolutions, publicationDate, minAgeRestriction, canBeDownloaded} = req.body;
-
     const errors: ErrorType = {
         errorsMessages: Array(0),
     };
@@ -154,7 +158,7 @@ app.put('/videos/:id', (req: PutVideoType<IdParamType, PutVideoItemType>, res: R
         }
     }
 
-    if (availableResolutions && Array.isArray(availableResolutions)) {
+    if (availableResolutions && Array.isArray(availableResolutions) && availableResolutions.length) {
         for (let i = 0; i < availableResolutions.length; i++) {
             if (!AvailableResolutionsType.includes(availableResolutions[i])) {
                 errors.errorsMessages[errors.errorsMessages.length] = {
@@ -188,6 +192,14 @@ app.put('/videos/:id', (req: PutVideoType<IdParamType, PutVideoItemType>, res: R
         }
     }
 
+    const isPublicationDateValid = isISOString(publicationDate);
+    if (!isPublicationDateValid && publicationDate !== undefined) {
+        errors.errorsMessages[errors.errorsMessages.length] = {
+            message: 'invalid publicationDate',
+            field: 'publicationDate'
+        }
+    }
+
     if (errors.errorsMessages.length) {
         res.status(HTTP_STATUSES.BAD_REQUEST_400).send(errors)
         return;
@@ -208,16 +220,10 @@ app.put('/videos/:id', (req: PutVideoType<IdParamType, PutVideoItemType>, res: R
         return;
     }
 
-    const parsedDate = new Date(Date.parse(publicationDate));
-
-    if (!publicationDate || !parsedDate || parsedDate.toISOString() !== publicationDate) {
-        publicationDate = new Date().toISOString()
-    }
-
     videosDb[indexOfRequestedVideo].title = title;
     videosDb[indexOfRequestedVideo].author = author;
     videosDb[indexOfRequestedVideo].availableResolutions = availableResolutions;
-    videosDb[indexOfRequestedVideo].publicationDate = publicationDate;
+    videosDb[indexOfRequestedVideo].publicationDate = publicationDate || videosDb[indexOfRequestedVideo].publicationDate;
     videosDb[indexOfRequestedVideo].canBeDownloaded = canBeDownloaded;
     videosDb[indexOfRequestedVideo].minAgeRestriction = minAgeRestriction || null;
 

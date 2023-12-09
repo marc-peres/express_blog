@@ -99,7 +99,7 @@ describe('videos api tests', () => {
     it('shouldn\'t change video and return 400', async () => {
 
         await request(app)
-            .put(`/videos/0`)
+            .put(`/videos/123`)
             .send({ title: '', author: '' })
             .expect(HTTP_STATUSES.BAD_REQUEST_400, {
                 errorsMessages: [
@@ -146,7 +146,14 @@ describe('videos api tests', () => {
     it('shouldn\'t found video and return 404', async () => {
         await request(app)
             .put('/videos/123')
-            .send({ title: 'new video', author: 'any author' })
+            .send({
+                title: 'new video',
+                author: 'any author',
+                availableResolutions: ["P144","P240","P720"],
+                canBeDownloaded: false,
+                minAgeRestriction: 17,
+                publicationDate: "2023-12-12T13:51:03.909Z"
+            })
             .expect(HTTP_STATUSES.NOT_FOUND_404);
     });
 
