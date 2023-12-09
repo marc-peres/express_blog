@@ -175,6 +175,13 @@ app.put('/videos/:id', (req: PutVideoType<IdParamType, PutVideoItemType>, res: R
         }
     }
 
+    if (!minAgeRestriction || minAgeRestriction !== minAgeRestriction || typeof minAgeRestriction !== "number" || minAgeRestriction < 1 || minAgeRestriction > 18) {
+        errors.errorsMessages[errors.errorsMessages.length] = {
+            message: 'invalid minAgeRestriction',
+            field: 'minAgeRestriction'
+        }
+    }
+
     if (errors.errorsMessages.length) {
         res.status(HTTP_STATUSES.BAD_REQUEST_400).send(errors)
         return;
@@ -199,9 +206,6 @@ app.put('/videos/:id', (req: PutVideoType<IdParamType, PutVideoItemType>, res: R
 
     if (!publicationDate || !parsedDate || parsedDate.toISOString() !== publicationDate) {
         publicationDate = new Date().toISOString()
-    }
-    if (!minAgeRestriction || minAgeRestriction !== minAgeRestriction || typeof minAgeRestriction !== "number" || minAgeRestriction < 1 || minAgeRestriction > 18) {
-        minAgeRestriction = null;
     }
 
     videosDb[indexOfRequestedVideo].title = title;
