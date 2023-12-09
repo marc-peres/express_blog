@@ -4,7 +4,7 @@ describe('videos api tests', () => {
 
     afterEach(async () => {
         await request(app)
-            .delete('/__test__/all-data')
+            .delete('/testing/all-data')
             .expect(HTTP_STATUSES.NO_CONTENT_204);
         expect(videosDb).toBeInstanceOf(Array);
         expect(videosDb).toHaveLength(0);

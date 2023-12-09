@@ -175,7 +175,13 @@ app.put('/videos/:id', (req: PutVideoType<IdParamType, PutVideoItemType>, res: R
         }
     }
 
-    if (!minAgeRestriction || minAgeRestriction !== minAgeRestriction || typeof minAgeRestriction !== "number" || minAgeRestriction < 1 || minAgeRestriction > 18) {
+    if (
+        (
+            typeof minAgeRestriction !== "number" ||
+            minAgeRestriction !== minAgeRestriction ||
+            minAgeRestriction < 1 || minAgeRestriction > 18
+        ) && minAgeRestriction !== undefined
+    ) {
         errors.errorsMessages[errors.errorsMessages.length] = {
             message: 'invalid minAgeRestriction',
             field: 'minAgeRestriction'
@@ -213,7 +219,7 @@ app.put('/videos/:id', (req: PutVideoType<IdParamType, PutVideoItemType>, res: R
     videosDb[indexOfRequestedVideo].availableResolutions = availableResolutions;
     videosDb[indexOfRequestedVideo].publicationDate = publicationDate;
     videosDb[indexOfRequestedVideo].canBeDownloaded = canBeDownloaded;
-    videosDb[indexOfRequestedVideo].minAgeRestriction = minAgeRestriction;
+    videosDb[indexOfRequestedVideo].minAgeRestriction = minAgeRestriction || null;
 
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 });
@@ -232,7 +238,7 @@ app.delete('/videos/:id', (req: Request, res: Response) => {
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
 });
 
-app.delete('/__test__/all-data', (req: Request, res: Response) => {
+app.delete('/testing/all-data', (req: Request, res: Response) => {
     videosDb = [];
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
 });

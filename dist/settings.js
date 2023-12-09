@@ -118,6 +118,14 @@ exports.app.put('/videos/:id', (req, res) => {
             field: 'canBeDownloaded'
         };
     }
+    if ((typeof minAgeRestriction !== "number" ||
+        minAgeRestriction !== minAgeRestriction ||
+        minAgeRestriction < 1 || minAgeRestriction > 18) && minAgeRestriction !== undefined) {
+        errors.errorsMessages[errors.errorsMessages.length] = {
+            message: 'invalid minAgeRestriction',
+            field: 'minAgeRestriction'
+        };
+    }
     if (errors.errorsMessages.length) {
         res.status(exports.HTTP_STATUSES.BAD_REQUEST_400).send(errors);
         return;
@@ -138,15 +146,12 @@ exports.app.put('/videos/:id', (req, res) => {
     if (!publicationDate || !parsedDate || parsedDate.toISOString() !== publicationDate) {
         publicationDate = new Date().toISOString();
     }
-    if (!minAgeRestriction || minAgeRestriction !== minAgeRestriction || typeof minAgeRestriction !== "number" || minAgeRestriction < 1 || minAgeRestriction > 18) {
-        minAgeRestriction = null;
-    }
     exports.videosDb[indexOfRequestedVideo].title = title;
     exports.videosDb[indexOfRequestedVideo].author = author;
     exports.videosDb[indexOfRequestedVideo].availableResolutions = availableResolutions;
     exports.videosDb[indexOfRequestedVideo].publicationDate = publicationDate;
     exports.videosDb[indexOfRequestedVideo].canBeDownloaded = canBeDownloaded;
-    exports.videosDb[indexOfRequestedVideo].minAgeRestriction = minAgeRestriction;
+    exports.videosDb[indexOfRequestedVideo].minAgeRestriction = minAgeRestriction || null;
     res.sendStatus(exports.HTTP_STATUSES.NO_CONTENT_204);
 });
 exports.app.delete('/videos/:id', (req, res) => {
@@ -159,7 +164,7 @@ exports.app.delete('/videos/:id', (req, res) => {
     exports.videosDb = exports.videosDb.filter(i => i.id !== requestedVideo.id);
     res.sendStatus(exports.HTTP_STATUSES.NO_CONTENT_204);
 });
-exports.app.delete('/__test__/all-data', (req, res) => {
+exports.app.delete('/testing/all-data', (req, res) => {
     exports.videosDb = [];
     res.sendStatus(exports.HTTP_STATUSES.NO_CONTENT_204);
 });
