@@ -18,7 +18,7 @@ type VideosDbType =  {
     availableResolutions: typeof AvailableResolutionsType;
 }
 
-let videosDb: VideosDbType[] = [
+export let videosDb: VideosDbType[] = [
     {
         id: 0,
         title: "string",
@@ -32,6 +32,15 @@ let videosDb: VideosDbType[] = [
         ]
     }
 ];
+
+export const HTTP_STATUSES = {
+    OK_200: 200,
+    CREATED_201: 201,
+    NO_CONTENT_204: 204,
+
+    BAD_REQUEST_400: 400,
+    NOT_FOUND_404: 404,
+}
 
 type PostVideoByIdType<I> = Request<I, {}, {}, {}>
 type PostVideoType<I> = Request<{}, {}, I, {}>
@@ -72,7 +81,7 @@ app.get('/videos/:id', (req: PostVideoByIdType<IdParamType>, res: Response) => {
     const requestedVideo = videosDb.find(i => i.id === id);
 
     if (!requestedVideo) {
-        res.sendStatus(404);
+        res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
         return;
     }
 
@@ -100,20 +109,21 @@ app.post('/videos', (req: PostVideoType<PostVideItemType>, res: Response) => {
     }
 
     if (availableResolutions && Array.isArray(availableResolutions)) {
-        availableResolutions.forEach(r => {
-            if (!AvailableResolutionsType.includes(r)) {
+        for (let i = 0; i < availableResolutions.length; i++) {
+            if (!AvailableResolutionsType.includes(availableResolutions[i])) {
                 errors.errorsMessages[errors.errorsMessages.length] = {
                     message: 'invalid availableResolutions',
                     field: 'availableResolutions'
                 }
+                break;
             }
-        })
+        }
     } else {
         availableResolutions = Array(AvailableResolutionsType[0]);
     }
 
     if (errors.errorsMessages.length) {
-        res.status(400).send(errors.errorsMessages)
+        res.status(HTTP_STATUSES.BAD_REQUEST_400).send(errors.errorsMessages)
         return;
     }
 
@@ -133,7 +143,7 @@ app.post('/videos', (req: PostVideoType<PostVideItemType>, res: Response) => {
 
     videosDb.push(newVideo);
 
-    res.status(201).send(newVideo)
+    res.status(HTTP_STATUSES.CREATED_201).send(newVideo)
 });
 
 app.put('/videos/:id', (req: PutVideoType<IdParamType, PutVideoItemType>, res: Response) => {
@@ -157,6 +167,25 @@ app.put('/videos/:id', (req: PutVideoType<IdParamType, PutVideoItemType>, res: R
         }
     }
 
+    if (availableResolutions && Array.isArray(availableResolutions)) {
+        for (let i = 0; i < availableResolutions.length; i++) {
+            if (!AvailableResolutionsType.includes(availableResolutions[i])) {
+                errors.errorsMessages[errors.errorsMessages.length] = {
+                    message: 'invalid availableResolutions',
+                    field: 'availableResolutions'
+                }
+                break;
+            }
+        }
+    } else {
+        availableResolutions = Array(AvailableResolutionsType[0]);
+    }
+
+    if (errors.errorsMessages.length) {
+        res.status(HTTP_STATUSES.BAD_REQUEST_400).send(errors.errorsMessages)
+        return;
+    }
+
     const id = +req.params.id
 
     let indexOfRequestedVideo = -1;
@@ -168,25 +197,7 @@ app.put('/videos/:id', (req: PutVideoType<IdParamType, PutVideoItemType>, res: R
     });
 
     if (!requestedVideo) {
-        res.sendStatus(404);
-        return;
-    }
-
-    if (availableResolutions && Array.isArray(availableResolutions)) {
-        availableResolutions.forEach(r => {
-            if (!AvailableResolutionsType.includes(r)) {
-                errors.errorsMessages[errors.errorsMessages.length] = {
-                    message: 'invalid availableResolutions',
-                    field: 'availableResolutions'
-                }
-            }
-        })
-    } else {
-        availableResolutions = Array(AvailableResolutionsType[0]);
-    }
-
-    if (errors.errorsMessages.length) {
-        res.status(400).send(errors.errorsMessages)
+        res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
         return;
     }
 
@@ -195,7 +206,6 @@ app.put('/videos/:id', (req: PutVideoType<IdParamType, PutVideoItemType>, res: R
     if (!publicationDate || !parsedDate || parsedDate.toISOString() !== publicationDate) {
         publicationDate = new Date().toISOString()
     }
-
     if (!minAgeRestriction || minAgeRestriction !== minAgeRestriction || typeof minAgeRestriction !== "number" || minAgeRestriction < 1 || minAgeRestriction > 18) {
         minAgeRestriction = null;
     }
@@ -209,8 +219,9 @@ app.put('/videos/:id', (req: PutVideoType<IdParamType, PutVideoItemType>, res: R
     videosDb[indexOfRequestedVideo].availableResolutions = availableResolutions;
     videosDb[indexOfRequestedVideo].publicationDate = publicationDate;
     videosDb[indexOfRequestedVideo].canBeDownloaded = canBeDownloaded;
+    videosDb[indexOfRequestedVideo].minAgeRestriction = minAgeRestriction;
 
-    res.sendStatus(204)
+    res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 });
 
 app.delete('/videos/:id', (req: Request, res: Response) => {
@@ -219,10 +230,15 @@ app.delete('/videos/:id', (req: Request, res: Response) => {
     const requestedVideo = videosDb.find(i => i.id === id);
 
     if (!requestedVideo) {
-        res.sendStatus(404);
+        res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
         return;
     }
 
     videosDb = videosDb.filter(i => i.id !== requestedVideo.id);
-    res.sendStatus(204);
+    res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
+});
+
+app.delete('/__test__/all-data', (req: Request, res: Response) => {
+    videosDb = [];
+    res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
 });
