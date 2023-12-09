@@ -18,20 +18,7 @@ type VideosDbType =  {
     availableResolutions: typeof AvailableResolutionsType;
 }
 
-export let videosDb: VideosDbType[] = [
-    {
-        id: 0,
-        title: "string",
-        author: "string",
-        canBeDownloaded: true,
-        minAgeRestriction: null,
-        createdAt: "2023-12-08T14:00:56.884Z",
-        publicationDate: "2023-12-08T14:00:56.884Z",
-        availableResolutions: [
-            "P144", 'P240'
-        ]
-    }
-];
+export let videosDb: VideosDbType[] = [];
 
 export const HTTP_STATUSES = {
     OK_200: 200,
@@ -123,7 +110,7 @@ app.post('/videos', (req: PostVideoType<PostVideItemType>, res: Response) => {
     }
 
     if (errors.errorsMessages.length) {
-        res.status(HTTP_STATUSES.BAD_REQUEST_400).send(errors.errorsMessages)
+        res.status(HTTP_STATUSES.BAD_REQUEST_400).send(errors)
         return;
     }
 
@@ -181,8 +168,15 @@ app.put('/videos/:id', (req: PutVideoType<IdParamType, PutVideoItemType>, res: R
         availableResolutions = Array(AvailableResolutionsType[0]);
     }
 
+    if (typeof canBeDownloaded !== 'boolean' && canBeDownloaded !== undefined) {
+        errors.errorsMessages[errors.errorsMessages.length] = {
+            message: 'invalid canBeDownloaded',
+            field: 'canBeDownloaded'
+        }
+    }
+
     if (errors.errorsMessages.length) {
-        res.status(HTTP_STATUSES.BAD_REQUEST_400).send(errors.errorsMessages)
+        res.status(HTTP_STATUSES.BAD_REQUEST_400).send(errors)
         return;
     }
 
@@ -208,10 +202,6 @@ app.put('/videos/:id', (req: PutVideoType<IdParamType, PutVideoItemType>, res: R
     }
     if (!minAgeRestriction || minAgeRestriction !== minAgeRestriction || typeof minAgeRestriction !== "number" || minAgeRestriction < 1 || minAgeRestriction > 18) {
         minAgeRestriction = null;
-    }
-
-    if (typeof canBeDownloaded !== 'boolean') {
-        canBeDownloaded = false;
     }
 
     videosDb[indexOfRequestedVideo].title = title;

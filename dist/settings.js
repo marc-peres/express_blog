@@ -8,20 +8,7 @@ const express_1 = __importDefault(require("express"));
 exports.app = (0, express_1.default)();
 exports.app.use(express_1.default.json());
 const AvailableResolutionsType = ['P144', 'P240', 'P360', 'P480', 'P720', 'P1080', 'P1440', 'P2160'];
-exports.videosDb = [
-    {
-        id: 0,
-        title: "string",
-        author: "string",
-        canBeDownloaded: true,
-        minAgeRestriction: null,
-        createdAt: "2023-12-08T14:00:56.884Z",
-        publicationDate: "2023-12-08T14:00:56.884Z",
-        availableResolutions: [
-            "P144", 'P240'
-        ]
-    }
-];
+exports.videosDb = [];
 exports.HTTP_STATUSES = {
     OK_200: 200,
     CREATED_201: 201,
@@ -76,7 +63,7 @@ exports.app.post('/videos', (req, res) => {
         availableResolutions = Array(AvailableResolutionsType[0]);
     }
     if (errors.errorsMessages.length) {
-        res.status(exports.HTTP_STATUSES.BAD_REQUEST_400).send(errors.errorsMessages);
+        res.status(exports.HTTP_STATUSES.BAD_REQUEST_400).send(errors);
         return;
     }
     const createdAt = new Date();
@@ -125,8 +112,14 @@ exports.app.put('/videos/:id', (req, res) => {
     else {
         availableResolutions = Array(AvailableResolutionsType[0]);
     }
+    if (typeof canBeDownloaded !== 'boolean' && canBeDownloaded !== undefined) {
+        errors.errorsMessages[errors.errorsMessages.length] = {
+            message: 'invalid canBeDownloaded',
+            field: 'canBeDownloaded'
+        };
+    }
     if (errors.errorsMessages.length) {
-        res.status(exports.HTTP_STATUSES.BAD_REQUEST_400).send(errors.errorsMessages);
+        res.status(exports.HTTP_STATUSES.BAD_REQUEST_400).send(errors);
         return;
     }
     const id = +req.params.id;
@@ -147,9 +140,6 @@ exports.app.put('/videos/:id', (req, res) => {
     }
     if (!minAgeRestriction || minAgeRestriction !== minAgeRestriction || typeof minAgeRestriction !== "number" || minAgeRestriction < 1 || minAgeRestriction > 18) {
         minAgeRestriction = null;
-    }
-    if (typeof canBeDownloaded !== 'boolean') {
-        canBeDownloaded = false;
     }
     exports.videosDb[indexOfRequestedVideo].title = title;
     exports.videosDb[indexOfRequestedVideo].author = author;

@@ -26,40 +26,46 @@ describe('videos api tests', () => {
         await request(app)
             .post('/videos')
             .send({ title: '', author: '' })
-            .expect(HTTP_STATUSES.BAD_REQUEST_400, [
-                {
-                    message: 'invalid title',
-                    field: 'title'
-                },
-                {
-                    message: 'invalid author',
-                    field: 'author'
-                },
-            ]);
+            .expect(HTTP_STATUSES.BAD_REQUEST_400, {
+                errorsMessages: [
+                    {
+                        message: 'invalid title',
+                        field: 'title'
+                    },
+                    {
+                        message: 'invalid author',
+                        field: 'author'
+                    },
+                ]
+            });
 
         await request(app)
             .post('/videos')
             .send({ title: 'asdasdasdasdasdasdasdasdasdasdasdasd12312', author: 'asdasdasdasdasdasdaas' })
-            .expect(HTTP_STATUSES.BAD_REQUEST_400, [
-                {
-                    message: 'invalid title',
-                    field: 'title'
-                },
-                {
-                    message: 'invalid author',
-                    field: 'author'
-                },
-            ]);
+            .expect(HTTP_STATUSES.BAD_REQUEST_400, {
+                errorsMessages: [
+                    {
+                        message: 'invalid title',
+                        field: 'title'
+                    },
+                    {
+                        message: 'invalid author',
+                        field: 'author'
+                    },
+                ]
+            });
 
         await request(app)
             .post('/videos')
             .send({ title: 'new video', author: 'any author', availableResolutions: [ '1', '2', '3', '3' ] })
-            .expect(HTTP_STATUSES.BAD_REQUEST_400, [
-                {
-                    message: 'invalid availableResolutions',
-                    field: 'availableResolutions'
-                }
-            ]);
+            .expect(HTTP_STATUSES.BAD_REQUEST_400, {
+                errorsMessages: [
+                    {
+                        message: 'invalid availableResolutions',
+                        field: 'availableResolutions'
+                    }
+                ]
+            });
     });
 
     it('should create new video with 201 without availableResolutions', async () => {
@@ -95,40 +101,46 @@ describe('videos api tests', () => {
         await request(app)
             .put(`/videos/0`)
             .send({ title: '', author: '' })
-            .expect(HTTP_STATUSES.BAD_REQUEST_400, [
-                {
-                    message: 'invalid title',
-                    field: 'title'
-                },
-                {
-                    message: 'invalid author',
-                    field: 'author'
-                },
-            ]);
+            .expect(HTTP_STATUSES.BAD_REQUEST_400, {
+                errorsMessages: [
+                    {
+                        message: 'invalid title',
+                        field: 'title'
+                    },
+                    {
+                        message: 'invalid author',
+                        field: 'author'
+                    },
+                ]
+            });
 
         await request(app)
             .put(`/videos/0`)
             .send({ title: 'asdasdasdasdasdasdasdasdasdasdasdasd12312', author: 'asdasdasdasdasdasdaas' })
-            .expect(HTTP_STATUSES.BAD_REQUEST_400, [
-                {
-                    message: 'invalid title',
-                    field: 'title'
-                },
-                {
-                    message: 'invalid author',
-                    field: 'author'
-                },
-            ]);
+            .expect(HTTP_STATUSES.BAD_REQUEST_400, {
+                errorsMessages: [
+                    {
+                        message: 'invalid title',
+                        field: 'title'
+                    },
+                    {
+                        message: 'invalid author',
+                        field: 'author'
+                    },
+                ]
+            });
 
         await request(app)
             .put(`/videos/0`)
             .send({ title: 'new video', author: 'any author', availableResolutions: [ '1', '2', '3', '3' ] })
-            .expect(HTTP_STATUSES.BAD_REQUEST_400, [
-                {
-                    message: 'invalid availableResolutions',
-                    field: 'availableResolutions'
-                }
-            ]);
+            .expect(HTTP_STATUSES.BAD_REQUEST_400, {
+                errorsMessages: [
+                    {
+                        message: 'invalid availableResolutions',
+                        field: 'availableResolutions'
+                    }
+                ]
+            });
     });
 
     it('shouldn\'t found video and return 404', async () => {
