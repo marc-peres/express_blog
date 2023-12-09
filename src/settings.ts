@@ -120,7 +120,8 @@ app.post('/videos', (req: PostVideoType<PostVideItemType>, res: Response) => {
     }
 
     const createdAt = new Date();
-    const publicationDate = new Date();
+    let publicationDate = new Date();
+    publicationDate = new Date(publicationDate.setDate(new Date().getDate() + 1))
 
     const newVideo: VideosDbType = {
         id: +createdAt,

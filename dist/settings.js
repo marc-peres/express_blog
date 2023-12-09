@@ -73,7 +73,8 @@ exports.app.post('/videos', (req, res) => {
         return;
     }
     const createdAt = new Date();
-    const publicationDate = new Date();
+    let publicationDate = new Date();
+    publicationDate = new Date(publicationDate.setDate(new Date().getDate() + 1));
     const newVideo = {
         id: +createdAt,
         createdAt: createdAt.toISOString(),
