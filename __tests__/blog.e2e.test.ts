@@ -24,6 +24,16 @@ describe('blogs api tests', () => {
     await request(app)
       .post(testingPath)
       .set(headersTestConfig)
+      .send({
+        id: '2023-12-17T12:00:24.261Z',
+        name: 'somename',
+        websiteUrl: 'https://length_101-DnZlTI1khUHpqOqCzftIYiSHCV8fKjYFQOoCIwmUczzW9V5K8cqY3aPKo3XKwbfrmeWOJyQgGnlX5sP3aW3RlaRSQx.com',
+        description: 'description',
+      })
+      .expect(HTTP_STATUSES.BAD_REQUEST_400);
+    await request(app)
+      .post(testingPath)
+      .set(headersTestConfig)
       .send({ name: '', description: '', websiteUrl: '' })
       .expect(HTTP_STATUSES.BAD_REQUEST_400);
     await request(app)

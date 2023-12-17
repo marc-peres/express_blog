@@ -10,13 +10,11 @@ export const postShortDescriptionValidation = body('shortDescription')
   .withMessage('Invalid shortDescription!');
 
 export const postContentValidation = body('content').isString().trim().isLength({ min: 1, max: 1000 }).withMessage('Invalid content!');
-export const postBlogIdValidation = body('blogId').isString().trim().notEmpty().withMessage('Invalid blogId!');
 
 export const createPostValidation = () => [
   authValidation,
   postTitleValidation,
   postShortDescriptionValidation,
   postContentValidation,
-  postBlogIdValidation,
   formattedErrorsValidation,
 ];
