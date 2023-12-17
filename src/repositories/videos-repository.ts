@@ -7,11 +7,6 @@ export class VideosRepository {
     return db.videos;
   }
 
-  static deleteAllVideos(): boolean {
-    db.videos = [];
-    return true;
-  }
-
   static findVideoById(id: number): VideosDbType | undefined {
     return db.videos.find(i => i.id === id);
   }

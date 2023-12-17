@@ -11,7 +11,7 @@ export const HTTP_STATUSES = {
 };
 
 export type PostRequestByIdType<I> = Request<I, {}, {}, {}>;
-export type PostRequestType<I> = Request<{}, {}, I, {}>;
+export type CreateRequestType<I> = Request<{}, {}, I, {}>;
 export type PutRequestType<P, I> = Request<P, {}, I, {}>;
 
 export type ErrorMessage = {

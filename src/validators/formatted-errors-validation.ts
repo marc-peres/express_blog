@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { ValidationError, validationResult } from 'express-validator';
-import { HTTP_STATUSES } from '../../models/common';
+import { HTTP_STATUSES } from '../models/common';
 
-export const inputValidation = (req: Request, res: Response, next: NextFunction) => {
+export const formattedErrorsValidation = (req: Request, res: Response, next: NextFunction) => {
   const formattedErrors = validationResult(req).formatWith((error: ValidationError) => {
     switch (error.type) {
       case 'field':
@@ -17,7 +17,6 @@ export const inputValidation = (req: Request, res: Response, next: NextFunction)
         };
     }
   });
-
   if (!formattedErrors.isEmpty()) {
     const errorsMessages = formattedErrors.array({ onlyFirstError: true });
 
@@ -26,6 +25,7 @@ export const inputValidation = (req: Request, res: Response, next: NextFunction)
     };
 
     res.status(HTTP_STATUSES.BAD_REQUEST_400).send(errors);
+    return;
   }
   next();
 };

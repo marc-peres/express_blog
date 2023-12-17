@@ -1,6 +1,6 @@
 import { db } from '../db/db';
 import { BlogItemType } from '../models/blogs/output';
-import { BlogIdParamType, PostBlogType } from '../models/blogs/input';
+import { BlogIdParamType, CreateBlogType } from '../models/blogs/input';
 import { PutRequestType } from '../models/common';
 
 export class BlogRepository {
@@ -8,13 +8,13 @@ export class BlogRepository {
     return db.blogs;
   }
 
-  static findBlogById(id: number): BlogItemType | undefined {
+  static findBlogById(id: string): BlogItemType | undefined {
     return db.blogs.find(i => i.id === id);
   }
 
-  static createNewBlog(body: PostBlogType): BlogItemType {
+  static createNewBlog(body: CreateBlogType): BlogItemType {
     const { name, websiteUrl, description } = body;
-    const id = +new Date();
+    const id = new Date().toISOString();
 
     const newBlog: BlogItemType = {
       id,
@@ -28,9 +28,9 @@ export class BlogRepository {
     return newBlog;
   }
 
-  static changeBlog(req: PutRequestType<BlogIdParamType, PostBlogType>): boolean {
+  static changeBlog(req: PutRequestType<BlogIdParamType, CreateBlogType>): boolean {
     const { name, websiteUrl, description } = req.body;
-    const id = +req.params.id;
+    const id = req.params.id;
 
     let indexOfRequestedBlog = -1;
     const requestedBlog = db.blogs.find((item, index) => {
@@ -51,7 +51,7 @@ export class BlogRepository {
     return true;
   }
 
-  static deleteBlogById(id: number): void {
+  static deleteBlogById(id: string): void {
     db.blogs = db.blogs.filter(i => i.id !== id);
   }
 

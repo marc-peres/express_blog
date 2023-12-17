@@ -1,5 +1,5 @@
 import { Request, Response, Router } from 'express';
-import { PostRequestByIdType, HTTP_STATUSES, PostRequestType, PutRequestType } from '../models/common';
+import { PostRequestByIdType, HTTP_STATUSES, CreateRequestType, PutRequestType } from '../models/common';
 import { PostVideItemType, PutVideoItemType, VideoIdParamType } from '../models/videos';
 import { idValid, videoPostValidation, videoPutValidation } from '../validators';
 import { VideosRepository } from '../repositories';
@@ -22,7 +22,7 @@ videoRoute.get('/:id', idValid(), (req: PostRequestByIdType<VideoIdParamType>, r
   res.send(requestedVideo);
 });
 
-videoRoute.post('/', videoPostValidation(), (req: PostRequestType<PostVideItemType>, res: Response) => {
+videoRoute.post('/', videoPostValidation(), (req: CreateRequestType<PostVideItemType>, res: Response) => {
   const body = req.body;
   const newVideo = VideosRepository.createNewVideo(body);
   res.status(HTTP_STATUSES.CREATED_201).send(newVideo);
@@ -42,9 +42,4 @@ videoRoute.delete('/:id', authValidation, idValid(), (req: Request, res: Respons
   }
   VideosRepository.deleteVideoById(id);
   res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
-});
-
-videoRoute.delete('/all-data', authValidation, (req: Request, res: Response) => {
-  const result = VideosRepository.deleteAllVideos();
-  result ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204) : res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
 });

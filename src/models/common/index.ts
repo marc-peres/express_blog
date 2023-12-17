@@ -1,3 +1,3 @@
-import { ErrorType, HTTP_STATUSES, PostRequestByIdType, PostRequestType, PutRequestType } from './comon';
+import { ErrorType, HTTP_STATUSES, PostRequestByIdType, CreateRequestType, PutRequestType } from './comon';
 
-export { HTTP_STATUSES, PostRequestByIdType, PostRequestType, PutRequestType, ErrorType };
+export { HTTP_STATUSES, PostRequestByIdType, CreateRequestType, PutRequestType, ErrorType };

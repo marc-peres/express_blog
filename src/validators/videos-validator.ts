@@ -1,5 +1,5 @@
 import { body } from 'express-validator';
-import { inputValidation } from '../middlewares/input-model-validation/input-validation';
+import { formattedErrorsValidation } from './formatted-errors-validation';
 import { AvailableResolutionsType } from '../models/videos';
 import { authValidation } from '../middlewares/auth/auth-validation';
 import { isISOString } from '../utils';
@@ -48,7 +48,7 @@ export const videoPostValidation = () => [
   videoTitleValidation,
   videoAuthorValidation,
   availableResolutionsAuthorValidation,
-  inputValidation,
+  formattedErrorsValidation,
 ];
 
 export const videoPutValidation = () => [
@@ -59,5 +59,5 @@ export const videoPutValidation = () => [
   videoCanBeDownloadedValidation,
   videoMinAgeRestrictionValidation,
   videoPublicationDateValidation,
-  inputValidation,
+  formattedErrorsValidation,
 ];
