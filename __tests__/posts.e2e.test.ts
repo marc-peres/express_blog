@@ -29,7 +29,7 @@ describe('posts api tests', () => {
       .post(testingPath)
       .set(headersTestConfig)
       .send({ content: 'content', shortDescription: 'shortDescription', title: 'title', blogId: '123' })
-      .expect(HTTP_STATUSES.NOT_FOUND_404);
+      .expect(HTTP_STATUSES.BAD_REQUEST_400);
     await request(app)
       .post(testingPath)
       .set(headersTestConfig)
@@ -81,7 +81,7 @@ describe('posts api tests', () => {
       .post(testingPath)
       .set(headersTestConfig)
       .send({ content: 'content', shortDescription: 'shortDescription', title: 'title', blogId: `wrong postId` })
-      .expect(HTTP_STATUSES.NOT_FOUND_404);
+      .expect(HTTP_STATUSES.BAD_REQUEST_400);
 
     const postCreatedResponse = await request(app)
       .post(testingPath)
