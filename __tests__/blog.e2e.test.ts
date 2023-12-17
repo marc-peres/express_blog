@@ -87,6 +87,12 @@ describe('blogs api tests', () => {
     const createdBlog = response.body;
     const { body } = await request(app).get(`/blogs/${createdBlog.id}`).set(headersTestConfig).expect(HTTP_STATUSES.OK_200);
     expect(body.id).toEqual(createdBlog.id);
+    expect(body).toEqual({
+      id: createdBlog.id,
+      name: 'new post',
+      description: 'new post description',
+      websiteUrl: 'https://post.test',
+    });
   });
 
   it('should change blog by id', async () => {
