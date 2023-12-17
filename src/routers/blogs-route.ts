@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import { PostRequestByIdType, HTTP_STATUSES, CreateRequestType, PutRequestType } from '../models/common';
-import { blogPostValidation, idValid } from '../validators';
+import { blogPostValidation } from '../validators';
 import { BlogRepository } from '../repositories';
 import { authValidation } from '../middlewares/auth/auth-validation';
 import { BlogIdParamType, CreateBlogType } from '../models/blogs/input';
@@ -17,7 +17,7 @@ blogRoute.post('/', blogPostValidation(), (req: CreateRequestType<CreateBlogType
   res.status(HTTP_STATUSES.CREATED_201).send(newVideo);
 });
 
-blogRoute.get('/:id', idValid(), (req: PostRequestByIdType<BlogIdParamType>, res: Response) => {
+blogRoute.get('/:id', (req: PostRequestByIdType<BlogIdParamType>, res: Response) => {
   const id = req.params.id;
   const requestedBlog = BlogRepository.findBlogById(id);
   if (!requestedBlog) {
@@ -32,7 +32,7 @@ blogRoute.put('/:id', blogPostValidation(), (req: PutRequestType<BlogIdParamType
   result ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204) : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
 });
 
-blogRoute.delete('/:id', authValidation, idValid(), (req: Request, res: Response) => {
+blogRoute.delete('/:id', authValidation, (req: Request, res: Response) => {
   const id = req.params.id;
   const requestedBlog = BlogRepository.findBlogById(id);
   if (!requestedBlog) {

@@ -1,6 +1,5 @@
 import { Request, Response, Router } from 'express';
 import { PostRequestByIdType, HTTP_STATUSES, CreateRequestType, PutRequestType } from '../models/common';
-import { idValid } from '../validators';
 import { BlogRepository } from '../repositories';
 import { authValidation } from '../middlewares/auth/auth-validation';
 import { BlogIdParamType } from '../models/blogs/input';
@@ -26,7 +25,7 @@ postsRoute.post('/', createPostValidation(), (req: CreateRequestType<CreatePostT
   res.status(HTTP_STATUSES.CREATED_201).send(newVideo);
 });
 
-postsRoute.get('/:id', idValid(), (req: PostRequestByIdType<BlogIdParamType>, res: Response) => {
+postsRoute.get('/:id', (req: PostRequestByIdType<BlogIdParamType>, res: Response) => {
   const id = req.params.id;
   const requestedPost = PostRepository.findPostById(id);
   if (!requestedPost) {
@@ -41,7 +40,7 @@ postsRoute.put('/:id', createPostValidation(), (req: PutRequestType<BlogIdParamT
   result ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204) : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
 });
 
-postsRoute.delete('/:id', authValidation, idValid(), (req: Request, res: Response) => {
+postsRoute.delete('/:id', authValidation, (req: Request, res: Response) => {
   const id = req.params.id;
   const requestedPost = PostRepository.findPostById(id);
   if (!requestedPost) {
