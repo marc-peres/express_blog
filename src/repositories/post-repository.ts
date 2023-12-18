@@ -2,8 +2,6 @@ import { db } from '../db/db';
 import { CreatePostType } from '../models/posts/input';
 import { PostItemType } from '../models/posts/output';
 import { BlogItemType } from '../models/blogs/output';
-import { PutRequestType } from '../models/common';
-import { BlogIdParamType } from '../models/blogs/input';
 
 export class PostRepository {
   static getAllPosts() {
@@ -32,9 +30,8 @@ export class PostRepository {
     return db.posts.find(i => i.id === id);
   }
 
-  static changePost(req: PutRequestType<BlogIdParamType, CreatePostType>): boolean {
-    const { content, blogId, shortDescription, title } = req.body;
-    const id = req.params.id;
+  static changePost(body: CreatePostType, id: string): boolean {
+    const { content, blogId, shortDescription, title } = body;
 
     let indexOfRequestedPost = -1;
     const requestedPost = db.posts.find((item, index) => {

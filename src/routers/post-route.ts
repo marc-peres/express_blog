@@ -15,13 +15,13 @@ postsRoute.get('/', (req: Request, res: Response) => {
   res.send(allPosts);
 });
 postsRoute.post('/', createPostValidation(), (req: CreateRequestType<CreatePostType>, res: Response) => {
-  const body = req.body;
-  const currentBlog = BlogRepository.findBlogById(body.blogId);
+  const {blogId, content, shortDescription, title} = req.body;
+  const currentBlog = BlogRepository.findBlogById(blogId);
   if (!currentBlog) {
     res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
     return;
   }
-  const newVideo = PostRepository.createNewPost(body, currentBlog as BlogItemType);
+  const newVideo = PostRepository.createNewPost({blogId, content, shortDescription, title}, currentBlog as BlogItemType);
   res.status(HTTP_STATUSES.CREATED_201).send(newVideo);
 });
 
@@ -36,7 +36,8 @@ postsRoute.get('/:id', (req: PostRequestByIdType<BlogIdParamType>, res: Response
 });
 
 postsRoute.put('/:id', createPostValidation(), (req: PutRequestType<BlogIdParamType, CreatePostType>, res: Response) => {
-  const result = PostRepository.changePost(req);
+  const {blogId, content, shortDescription, title} = req.body;
+  const result = PostRepository.changePost({blogId, content, shortDescription, title}, req.params.id);
   result ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204) : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
 });
 

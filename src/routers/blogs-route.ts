@@ -12,8 +12,8 @@ blogRoute.get('/', (req: Request, res: Response) => {
   res.send(allVideos);
 });
 blogRoute.post('/', blogPostValidation(), (req: CreateRequestType<CreateBlogType>, res: Response) => {
-  const body = req.body;
-  const newVideo = BlogRepository.createNewBlog(body);
+  const { name, websiteUrl, description } = req.body;
+  const newVideo = BlogRepository.createNewBlog({ name, websiteUrl, description });
   res.status(HTTP_STATUSES.CREATED_201).send(newVideo);
 });
 
@@ -28,7 +28,8 @@ blogRoute.get('/:id', (req: PostRequestByIdType<BlogIdParamType>, res: Response)
 });
 
 blogRoute.put('/:id', blogPostValidation(), (req: PutRequestType<BlogIdParamType, CreateBlogType>, res: Response) => {
-  const result = BlogRepository.changeBlog(req);
+  const { name, websiteUrl, description } = req.body;
+  const result = BlogRepository.changeBlog({ name, websiteUrl, description }, req.params.id);
   result ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204) : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
 });
 blogRoute.delete('/all-blogs', (req: Request, res: Response) => {
