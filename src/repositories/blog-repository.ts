@@ -1,7 +1,6 @@
 import { db } from '../db/db';
 import { BlogItemType } from '../models/blogs/output';
-import { BlogIdParamType, CreateBlogType } from '../models/blogs/input';
-import { PutRequestType } from '../models/common';
+import { CreateBlogType } from '../models/blogs/input';
 
 export class BlogRepository {
   static getAllBlogs(): BlogItemType[] {
@@ -28,9 +27,8 @@ export class BlogRepository {
     return newBlog;
   }
 
-  static changeBlog(req: PutRequestType<BlogIdParamType, CreateBlogType>): boolean {
-    const { name, websiteUrl, description } = req.body;
-    const id = req.params.id;
+  static changeBlog(body: CreateBlogType, id: string): boolean {
+    const { name, websiteUrl, description } = body;
 
     let indexOfRequestedBlog = -1;
     const requestedBlog = db.blogs.find((item, index) => {
