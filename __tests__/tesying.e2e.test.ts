@@ -1,15 +1,16 @@
-import { app } from '../src';
 import request = require('supertest');
 import { HTTP_STATUSES } from '../src/models/common';
 import { headersTestConfig } from './config';
+import { app } from '../src/setting';
+import { db } from '../src/db/db';
 
 const testingPath = '/testing';
 describe('testing api tests', () => {
-  // beforeAll(async () => {
-  //   await request(app).delete('/blogs/all-blogs').set(headersTestConfig).expect(HTTP_STATUSES.NO_CONTENT_204);
-  //   expect(db.blogs).toBeInstanceOf(Array);
-  //   expect(db.blogs).toHaveLength(0);
-  // });
+  beforeAll(async () => {
+    await request(app).delete('/blogs/all-blogs').set(headersTestConfig).expect(HTTP_STATUSES.NO_CONTENT_204);
+    expect(db.blogs).toBeInstanceOf(Array);
+    expect(db.blogs).toHaveLength(0);
+  });
 
   it('should delete all data', async () => {
     await request(app).delete(`${testingPath}/all-data`).set(headersTestConfig).expect(HTTP_STATUSES.NO_CONTENT_204);

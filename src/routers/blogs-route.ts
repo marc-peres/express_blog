@@ -31,7 +31,10 @@ blogRoute.put('/:id', blogPostValidation(), (req: PutRequestType<BlogIdParamType
   const result = BlogRepository.changeBlog(req);
   result ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204) : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
 });
-
+blogRoute.delete('/all-blogs', (req: Request, res: Response) => {
+  BlogRepository.deleteAllBlogs();
+  res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
+});
 blogRoute.delete('/:id', authValidation, (req: Request, res: Response) => {
   const id = req.params.id;
   const requestedBlog = BlogRepository.findBlogById(id);
@@ -40,10 +43,5 @@ blogRoute.delete('/:id', authValidation, (req: Request, res: Response) => {
     return;
   }
   BlogRepository.deleteBlogById(id);
-  res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
-});
-
-blogRoute.delete('/all-blogs', authValidation, (req: Request, res: Response) => {
-  BlogRepository.deleteAllBlogs();
   res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
 });
