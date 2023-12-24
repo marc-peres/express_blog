@@ -1,10 +1,14 @@
 import { Request, Response, Router } from 'express';
 import { HTTP_STATUSES } from '../models/common';
-import { TestingRepository } from '../repositories/testing-repository';
+import { blogsCollection, postsCollection } from '../db/db';
 
 export const testingRoute = Router({});
 
-testingRoute.delete('/all-data', (req: Request, res: Response) => {
-  const result = TestingRepository.deleteAllVideos();
-  result ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204) : res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
+testingRoute.delete('/all-data', async (req: Request, res: Response) => {
+  // необходимо иметь права администратора
+  // await dataBase.dropDatabase();
+  await blogsCollection.deleteMany({});
+  await postsCollection.deleteMany({});
+
+  res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
 });

@@ -6,28 +6,40 @@ import { BlogIdParamType } from '../models/blogs/input';
 import { PostRepository } from '../repositories/post-repository';
 import { createPostValidation } from '../validators/posts-validator';
 import { CreatePostType } from '../models/posts/input';
-import { BlogItemType } from '../models/blogs/output';
+import { ObjectId } from 'mongodb';
 
 export const postsRoute = Router({});
 
-postsRoute.get('/', (req: Request, res: Response) => {
-  const allPosts = PostRepository.getAllPosts();
+postsRoute.get('/', async (req: Request, res: Response) => {
+  const allPosts = await PostRepository.getAllPosts();
   res.send(allPosts);
 });
-postsRoute.post('/', createPostValidation(), (req: CreateRequestType<CreatePostType>, res: Response) => {
-  const {blogId, content, shortDescription, title} = req.body;
-  const currentBlog = BlogRepository.findBlogById(blogId);
+postsRoute.post('/', createPostValidation(), async (req: CreateRequestType<CreatePostType>, res: Response) => {
+  const { blogId, content, shortDescription, title } = req.body;
+
+  if (!ObjectId.isValid(blogId)) {
+    res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
+    return;
+  }
+
+  const currentBlog = await BlogRepository.findBlogById(blogId);
   if (!currentBlog) {
     res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
     return;
   }
-  const newVideo = PostRepository.createNewPost({blogId, content, shortDescription, title}, currentBlog as BlogItemType);
+  const newVideo = await PostRepository.createNewPost({ blogId, content, shortDescription, title }, currentBlog);
   res.status(HTTP_STATUSES.CREATED_201).send(newVideo);
 });
 
-postsRoute.get('/:id', (req: PostRequestByIdType<BlogIdParamType>, res: Response) => {
+postsRoute.get('/:id', async (req: PostRequestByIdType<BlogIdParamType>, res: Response) => {
   const id = req.params.id;
-  const requestedPost = PostRepository.findPostById(id);
+
+  if (!ObjectId.isValid(id)) {
+    res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
+    return;
+  }
+
+  const requestedPost = await PostRepository.findPostById(id);
   if (!requestedPost) {
     res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
     return;
@@ -35,24 +47,38 @@ postsRoute.get('/:id', (req: PostRequestByIdType<BlogIdParamType>, res: Response
   res.send(requestedPost);
 });
 
-postsRoute.put('/:id', createPostValidation(), (req: PutRequestType<BlogIdParamType, CreatePostType>, res: Response) => {
-  const {blogId, content, shortDescription, title} = req.body;
-  const result = PostRepository.changePost({blogId, content, shortDescription, title}, req.params.id);
+postsRoute.put('/:id', createPostValidation(), async (req: PutRequestType<BlogIdParamType, CreatePostType>, res: Response) => {
+  const { blogId, content, shortDescription, title } = req.body;
+  const id = req.params.id;
+
+  if (!ObjectId.isValid(id)) {
+    res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
+    return;
+  }
+
+  const result = await PostRepository.changePost({ blogId, content, shortDescription, title }, id);
   result ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204) : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
 });
 
-postsRoute.delete('/:id', authValidation, (req: Request, res: Response) => {
+postsRoute.delete('/:id', authValidation, async (req: Request, res: Response) => {
   const id = req.params.id;
-  const requestedPost = PostRepository.findPostById(id);
+
+  if (!ObjectId.isValid(id)) {
+    res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
+    return;
+  }
+
+  const requestedPost = await PostRepository.findPostById(id);
   if (!requestedPost) {
     res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
     return;
   }
-  PostRepository.deletePostById(id);
+  await PostRepository.deletePostById(id);
   res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
 });
 
-postsRoute.delete('/all-posts', authValidation, (req: Request, res: Response) => {
-  PostRepository.deleteAllPosts();
+postsRoute.delete('/all-posts', async (req: Request, res: Response) => {
+  console.log('delete/all-posts');
+  await PostRepository.deleteAllPosts();
   res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
 });

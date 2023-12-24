@@ -1,19 +1,25 @@
 import request = require('supertest');
 import { HTTP_STATUSES } from '../src/models/common';
-import { db } from '../src/db/db';
 import { headersTestConfig } from './config';
 import { app } from '../src/setting';
+import { MongoClient } from 'mongodb';
 
 const testingPath = '/blogs';
+const mongoURI = process.env.MONGO_LOCAL_URI || 'mongodb://localhost:27017';
 describe('blogs api tests', () => {
+  const client = new MongoClient(mongoURI);
+
   beforeAll(async () => {
+    await client.connect();
     await request(app).delete('/blogs/all-blogs').expect(HTTP_STATUSES.NO_CONTENT_204);
-    expect(db.blogs).toBeInstanceOf(Array);
-    expect(db.blogs).toHaveLength(0);
+  });
+
+  afterAll(async () => {
+    await client.close();
   });
 
   it('should return 200 and blogs list', async () => {
-    await request(app).get(testingPath).expect(HTTP_STATUSES.OK_200, db.blogs);
+    await request(app).get(testingPath).expect(HTTP_STATUSES.OK_200);
   });
 
   it(`shouldn't create blog end return 401 Unauthorized`, async () => {
@@ -85,6 +91,8 @@ describe('blogs api tests', () => {
       name: 'new post',
       description: 'new post description',
       websiteUrl: 'https://post.test',
+      createdAt: expect.any(String),
+      isMembership: false,
     });
   });
 
@@ -95,13 +103,15 @@ describe('blogs api tests', () => {
       .send({ name: 'new post', description: 'new post description', websiteUrl: 'https://post.test' })
       .expect(HTTP_STATUSES.CREATED_201);
     const createdBlog = response.body;
-    const { body } = await request(app).get(`/blogs/${createdBlog.id}`).set(headersTestConfig).expect(HTTP_STATUSES.OK_200);
+    const { body } = await request(app).get(`${testingPath}/${createdBlog.id}`).expect(HTTP_STATUSES.OK_200);
     expect(body.id).toEqual(createdBlog.id);
     expect(body).toEqual({
       id: createdBlog.id,
       name: 'new post',
       description: 'new post description',
       websiteUrl: 'https://post.test',
+      createdAt: expect.any(String),
+      isMembership: false,
     });
   });
 
@@ -128,6 +138,8 @@ describe('blogs api tests', () => {
       name: 'new post',
       description: 'new post description',
       websiteUrl: 'https://newpost.test',
+      createdAt: expect.any(String),
+      isMembership: false,
     });
   });
 

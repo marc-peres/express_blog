@@ -2,6 +2,7 @@ import { body } from 'express-validator';
 import { formattedErrorsValidation } from './formatted-errors-validation';
 import { authValidation } from '../middlewares/auth/auth-validation';
 import { BlogRepository } from '../repositories';
+import { ObjectId } from 'mongodb';
 
 export const postTitleValidation = body('title').isString().trim().isLength({ min: 1, max: 30 }).withMessage('Invalid title!');
 export const postShortDescriptionValidation = body('shortDescription')
@@ -15,8 +16,11 @@ export const postBlogIdValidation = body('blogId')
   .isString()
   .trim()
   .notEmpty()
-  .custom(value => {
-    return !!BlogRepository.findBlogById(value);
+  .custom(async value => {
+    if (!ObjectId.isValid(value)) {
+      throw Error('Invalid blogId!');
+    }
+    return await !!BlogRepository.findBlogById(value);
   })
   .withMessage('Invalid blogId!');
 

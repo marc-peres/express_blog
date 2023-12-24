@@ -1,18 +1,24 @@
 import request = require('supertest');
 import { HTTP_STATUSES } from '../src/models/common';
-import { db } from '../src/db/db';
 import { headersTestConfig } from './config';
 import { app } from '../src/setting';
+import { MongoClient } from 'mongodb';
 const testingPath = '/posts';
+const mongoURI = process.env.MONGO_LOCAL_URI || 'mongodb://localhost:27017';
 describe('posts api tests', () => {
+  const client = new MongoClient(mongoURI);
+
   beforeAll(async () => {
-    await request(app).delete('/blogs/all-blogs').set(headersTestConfig).expect(HTTP_STATUSES.NO_CONTENT_204);
-    expect(db.blogs).toBeInstanceOf(Array);
-    expect(db.blogs).toHaveLength(0);
+    await client.connect();
+    await request(app).delete(`/testing/all-data`).expect(HTTP_STATUSES.NO_CONTENT_204);
+  });
+
+  afterAll(async () => {
+    await client.close();
   });
 
   it('should return 200 and posts list', async () => {
-    await request(app).get(testingPath).expect(HTTP_STATUSES.OK_200, db.posts);
+    await request(app).get(testingPath).expect(HTTP_STATUSES.OK_200);
   });
 
   it(`shouldn't create post end return 401 Unauthorized`, async () => {
@@ -23,7 +29,7 @@ describe('posts api tests', () => {
     await request(app)
       .post(testingPath)
       .set(headersTestConfig)
-      .send({ content: '', shortDescription: '', title: '', blogId: '' })
+      .send({ content: 'a', shortDescription: 's', title: 'd', blogId: 'f' })
       .expect(HTTP_STATUSES.BAD_REQUEST_400);
     await request(app)
       .post(testingPath)
@@ -61,6 +67,7 @@ describe('posts api tests', () => {
 
     expect(postCreateResponse.body).toEqual({
       id: expect.any(String),
+      createdAt: expect.any(String),
       content: 'content',
       shortDescription: 'shortDescription',
       title: 'title',
@@ -122,6 +129,7 @@ describe('posts api tests', () => {
 
     expect(body).toEqual({
       id: postCreatedResponse.body.id,
+      createdAt: expect.any(String),
       content: 'new content',
       shortDescription: 'new shortDescription',
       title: 'new title',
@@ -145,7 +153,7 @@ describe('posts api tests', () => {
       .expect(HTTP_STATUSES.CREATED_201);
     const createdPost = postCreatedResponse.body;
 
-    await request(app).delete(`${testingPath}/${123}`).set(headersTestConfig).expect(HTTP_STATUSES.NOT_FOUND_404);
+    await request(app).delete(`${testingPath}/${123}`).set(headersTestConfig).expect(HTTP_STATUSES.BAD_REQUEST_400);
     await request(app).delete(`${testingPath}/${createdPost.id}`).set(headersTestConfig).expect(HTTP_STATUSES.NO_CONTENT_204);
 
     await request(app).get(`${testingPath}/${createdPost.id}`).set(headersTestConfig).expect(HTTP_STATUSES.NOT_FOUND_404);
