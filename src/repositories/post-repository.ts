@@ -21,7 +21,7 @@ export class PostRepository {
   }
 
   static async createNewPost(createData: CreatePostType, currentBlog: BlogItemType): Promise<PostItemType> {
-    const createdAt = new Date().toString();
+    const createdAt = new Date().toISOString();
     const post = await postsCollection.insertOne({
       ...createData,
       blogName: currentBlog?.name,
