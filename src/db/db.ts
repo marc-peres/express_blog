@@ -3,18 +3,14 @@ import dotenv from 'dotenv';
 import { MongoClient } from 'mongodb';
 
 dotenv.config();
-if (!process.env.PORT) {
-  throw new Error(` ! process.env.PORT doesn't found`);
-}
-if (!process.env.MONGO_URI) {
-  throw new Error(` ! process.env.MONGO_URI doesn't found`);
-}
-if (!process.env.MONGO_LOCAL_URI) {
-  throw new Error(` ! process.env.MONGO_LOCAL_URI doesn't found`);
-}
+
 const port = process.env.PORT;
 
-const uri = process.env.MONGO_LOCAL_URI || process.env.MONGO_URI;
+const uri = process.env.MONGO_URI || process.env.MONGO_LOCAL_URI;
+
+if (!uri) {
+  throw new Error('! incorrect URI');
+}
 
 const client = new MongoClient(uri);
 export const dataBase = client.db('blogs-hws');
