@@ -3,6 +3,7 @@ import { HTTP_STATUSES } from '../src/models/common';
 import { headersTestConfig } from './config';
 import { app } from '../src/setting';
 import { MongoClient } from 'mongodb';
+
 const testingPath = '/posts';
 const mongoURI = process.env.MONGO_LOCAL_URI || 'mongodb://localhost:27017';
 describe('posts api tests', () => {
@@ -65,6 +66,7 @@ describe('posts api tests', () => {
       .send({ content: 'content', shortDescription: 'shortDescription', title: 'title', blogId: `${createdBlog.id}` })
       .expect(HTTP_STATUSES.CREATED_201);
 
+    expect(postCreateResponse.body.createdAt).toMatch(/\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/);
     expect(postCreateResponse.body).toEqual({
       id: expect.any(String),
       createdAt: expect.any(String),
@@ -137,7 +139,7 @@ describe('posts api tests', () => {
       .get(`${testingPath}/${postCreatedResponse.body.id}`)
       .set(headersTestConfig)
       .expect(HTTP_STATUSES.OK_200);
-
+    expect(body.createdAt).toMatch(/\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/);
     expect(body).toEqual({
       id: postCreatedResponse.body.id,
       createdAt: expect.any(String),

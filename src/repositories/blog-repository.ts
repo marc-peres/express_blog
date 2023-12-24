@@ -21,7 +21,7 @@ export class BlogRepository {
   }
 
   static async createNewBlog(createData: CreateBlogType): Promise<BlogItemType> {
-    const createdAt = new Date().toString();
+    const createdAt = new Date().toISOString();
     const blog = await blogsCollection.insertOne({
       ...createData,
       isMembership: false,
