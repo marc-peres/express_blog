@@ -6,10 +6,9 @@ dotenv.config();
 const port = process.env.PORT || 3000;
 
 const uri =
-  process.env.MONGO_LOCAL_URI ||
-  'mongodb://localhost:27017' ||
-  process.env.MONGO_URI ||
-  'mongodb+srv://peresm:euLCflFNzxuOvhJX@incubator3week.4xlby5h.mongodb.net/';
+  // process.env.MONGO_LOCAL_URI ||
+  // 'mongodb://localhost:27017' ||
+  process.env.MONGO_URI || 'mongodb+srv://peresm:euLCflFNzxuOvhJX@incubator3week.4xlby5h.mongodb.net/?retryWrites=true&w=majority';
 
 const client = new MongoClient(uri);
 export const dataBase = client.db('blogs-hws');
