@@ -1,60 +1,68 @@
-import { db } from '../db/db';
+import { blogsCollection } from '../db/db';
 import { BlogItemType } from '../models/blogs/output';
 import { CreateBlogType } from '../models/blogs/input';
+import { blogMapper } from '../models/blogs/mappers/mapper';
+import { ObjectId } from 'mongodb';
 
 export class BlogRepository {
-  static getAllBlogs(): BlogItemType[] {
-    return db.blogs;
+  static async getAllBlogs(): Promise<BlogItemType[]> {
+    const blogs = await blogsCollection.find({}).toArray();
+    return blogs.map(blogMapper);
   }
 
-  static findBlogById(id: string): BlogItemType | undefined {
-    return db.blogs.find(i => i.id === id);
-  }
+  static async findBlogById(id: string): Promise<BlogItemType | null> {
+    const blog = await blogsCollection.findOne({ _id: new ObjectId(id) });
 
-  static createNewBlog(body: CreateBlogType): BlogItemType {
-    const { name, websiteUrl, description } = body;
-    const id = new Date().toISOString();
-
-    const newBlog: BlogItemType = {
-      id,
-      name,
-      websiteUrl,
-      description,
-    };
-
-    db.blogs.push(newBlog);
-
-    return newBlog;
-  }
-
-  static changeBlog(body: CreateBlogType, id: string): boolean {
-    const { name, websiteUrl, description } = body;
-
-    let indexOfRequestedBlog = -1;
-    const requestedBlog = db.blogs.find((item, index) => {
-      if (item.id === id) {
-        indexOfRequestedBlog = index;
-      }
-      return item.id === id;
-    });
-
-    if (!requestedBlog) {
-      return false;
+    if (!blog) {
+      return null;
     }
 
-    db.blogs[indexOfRequestedBlog].name = name;
-    db.blogs[indexOfRequestedBlog].websiteUrl = websiteUrl;
-    db.blogs[indexOfRequestedBlog].description = description;
-
-    return true;
+    return blogMapper(blog);
   }
 
-  static deleteBlogById(id: string): void {
-    db.blogs = db.blogs.filter(i => i.id !== id);
+  static async createNewBlog(createData: CreateBlogType): Promise<BlogItemType> {
+    const createdAt = new Date().toString();
+    const blog = await blogsCollection.insertOne({
+      ...createData,
+      isMembership: false,
+      createdAt,
+    });
+
+    return {
+      ...createData,
+      isMembership: false,
+      createdAt,
+      id: blog.insertedId.toString(),
+    };
   }
 
-  static deleteAllBlogs(): boolean {
-    db.blogs = [];
-    return !db.blogs.length;
+  static async updateBlog(updateData: CreateBlogType, id: string): Promise<boolean> {
+    const blog = await blogsCollection.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          websiteUrl: updateData.websiteUrl,
+          name: updateData.name,
+          description: updateData.description,
+        },
+      },
+    );
+
+    return !!blog.matchedCount;
+  }
+
+  static async deleteBlogById(id: string): Promise<boolean> {
+    const blog = await blogsCollection.deleteOne({ _id: new ObjectId(id) });
+
+    return !!blog.deletedCount;
+  }
+
+  static async deleteAllBlogs(): Promise<boolean> {
+    const blogsCount = await blogsCollection
+      .find({})
+      .toArray()
+      .then(res => res.length);
+    const blog = await blogsCollection.deleteMany({});
+    return blog.deletedCount === blogsCount;
   }
 }

@@ -1,9 +1,15 @@
-import { VideosDbType } from '../videos';
-import { BlogItemType } from '../blogs/output';
-import { PostItemType } from '../posts/output';
-
-export type DbType = {
-  videos: VideosDbType[];
-  blogs: BlogItemType[];
-  posts: PostItemType[];
+export type BlogBdType = {
+  name: string;
+  description: string;
+  websiteUrl: string;
+  createdAt: string;
+  isMembership: boolean;
+};
+export type PostBdType = {
+  title: string;
+  shortDescription: string;
+  content: string;
+  blogId: string;
+  blogName: string;
+  createdAt: string;
 };

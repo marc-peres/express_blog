@@ -4,22 +4,30 @@ import { blogPostValidation } from '../validators';
 import { BlogRepository } from '../repositories';
 import { authValidation } from '../middlewares/auth/auth-validation';
 import { BlogIdParamType, CreateBlogType } from '../models/blogs/input';
+import { ObjectId } from 'mongodb';
 
 export const blogRoute = Router({});
 
-blogRoute.get('/', (req: Request, res: Response) => {
-  const allVideos = BlogRepository.getAllBlogs();
+blogRoute.get('/', async (req: Request, res: Response) => {
+  const allVideos = await BlogRepository.getAllBlogs();
   res.send(allVideos);
 });
-blogRoute.post('/', blogPostValidation(), (req: CreateRequestType<CreateBlogType>, res: Response) => {
+
+blogRoute.post('/', blogPostValidation(), async (req: CreateRequestType<CreateBlogType>, res: Response) => {
   const { name, websiteUrl, description } = req.body;
-  const newVideo = BlogRepository.createNewBlog({ name, websiteUrl, description });
+  const newVideo = await BlogRepository.createNewBlog({ name, websiteUrl, description });
   res.status(HTTP_STATUSES.CREATED_201).send(newVideo);
 });
 
-blogRoute.get('/:id', (req: PostRequestByIdType<BlogIdParamType>, res: Response) => {
+blogRoute.get('/:id', async (req: PostRequestByIdType<BlogIdParamType>, res: Response) => {
   const id = req.params.id;
-  const requestedBlog = BlogRepository.findBlogById(id);
+
+  if (!ObjectId.isValid(id)) {
+    res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+    return;
+  }
+
+  const requestedBlog = await BlogRepository.findBlogById(id);
   if (!requestedBlog) {
     res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
     return;
@@ -27,22 +35,31 @@ blogRoute.get('/:id', (req: PostRequestByIdType<BlogIdParamType>, res: Response)
   res.send(requestedBlog);
 });
 
-blogRoute.put('/:id', blogPostValidation(), (req: PutRequestType<BlogIdParamType, CreateBlogType>, res: Response) => {
+blogRoute.put('/:id', blogPostValidation(), async (req: PutRequestType<BlogIdParamType, CreateBlogType>, res: Response) => {
   const { name, websiteUrl, description } = req.body;
-  const result = BlogRepository.changeBlog({ name, websiteUrl, description }, req.params.id);
-  result ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204) : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
-});
-blogRoute.delete('/all-blogs', (req: Request, res: Response) => {
-  BlogRepository.deleteAllBlogs();
-  res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
-});
-blogRoute.delete('/:id', authValidation, (req: Request, res: Response) => {
   const id = req.params.id;
-  const requestedBlog = BlogRepository.findBlogById(id);
-  if (!requestedBlog) {
+
+  if (!ObjectId.isValid(id)) {
     res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
     return;
   }
-  BlogRepository.deleteBlogById(id);
-  res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
+
+  const result = await BlogRepository.updateBlog({ name, websiteUrl, description }, id);
+  result ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204) : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+});
+
+blogRoute.delete('/all-blogs', async (req: Request, res: Response) => {
+  const result = await BlogRepository.deleteAllBlogs();
+  result ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204) : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+});
+
+blogRoute.delete('/:id', authValidation, async (req: Request, res: Response) => {
+  const id = req.params.id;
+  if (!ObjectId.isValid(id)) {
+    res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+    return;
+  }
+  const result = await BlogRepository.deleteBlogById(id);
+
+  result ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204) : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
 });
