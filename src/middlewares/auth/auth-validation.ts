@@ -21,10 +21,6 @@ export const authValidation = (req: Request, res: Response, next: NextFunction) 
   const decodeAuth = Buffer.from(token, 'base64').toString();
   const [login, password] = decodeAuth.split(':');
 
-  if (!process.env.AUTH_LOGIN || !process.env.AUTH_PASSWORD) {
-    throw new Error(` ! AUTH_PASSWORD or AUTH_LOGIN doesn't found`);
-  }
-
   if (login !== process.env.AUTH_LOGIN || password !== process.env.AUTH_PASSWORD) {
     res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
     return;
