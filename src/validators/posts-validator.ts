@@ -20,7 +20,12 @@ export const postBlogIdValidation = body('blogId')
     if (!ObjectId.isValid(value)) {
       throw Error('Invalid blogId!');
     }
-    return await !!BlogRepository.findBlogById(value);
+    const result = await BlogRepository.findBlogById(value);
+
+    if (!result) {
+      throw Error('Invalid blogId!');
+    }
+    return true;
   })
   .withMessage('Invalid blogId!');
 

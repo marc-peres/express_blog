@@ -119,6 +119,17 @@ describe('posts api tests', () => {
     await request(app)
       .put(`${testingPath}/${postCreatedResponse.body.id}`)
       .set(headersTestConfig)
+      .send({
+        content: 'valid',
+        shortDescription: 'length_101-DnZlTI1khUHpqOqCzftIYiSHCV8fKjYFQOoCIwmUczzW9V5K8cqY3aPKo3XKwbfrmeWOJyQgGnlX5sP3aW3RlaRSQx',
+        title: 'valid',
+        blogId: `63189b06003380064c4193be`,
+      })
+      .expect(HTTP_STATUSES.BAD_REQUEST_400);
+
+    await request(app)
+      .put(`${testingPath}/${postCreatedResponse.body.id}`)
+      .set(headersTestConfig)
       .send({ content: 'new content', shortDescription: 'new shortDescription', title: 'new title', blogId: `${createdBlog.id}` })
       .expect(HTTP_STATUSES.NO_CONTENT_204);
 
