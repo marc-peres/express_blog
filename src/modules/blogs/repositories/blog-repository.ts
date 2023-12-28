@@ -1,9 +1,8 @@
-import { blogsCollection } from '../db/db';
-import { BlogItemType } from '../models/blogs/output';
-import { CreateBlogType } from '../models/blogs/input';
-import { blogMapper } from '../models/blogs/mappers/mapper';
+import { blogsCollection } from '../../../db/db';
+import { blogMapper } from '../mappers/mapper';
 import { ObjectId } from 'mongodb';
-
+import { BlogItemType } from '../models/output';
+import { CreateBlogType } from '../models/input';
 export class BlogRepository {
   static async getAllBlogs(): Promise<BlogItemType[]> {
     const blogs = await blogsCollection.find({}).toArray();

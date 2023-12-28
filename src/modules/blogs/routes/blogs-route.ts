@@ -1,10 +1,10 @@
 import { Request, Response, Router } from 'express';
-import { PostRequestByIdType, HTTP_STATUSES, CreateRequestType, PutRequestType } from '../models/common';
-import { blogPostValidation } from '../validators';
-import { BlogRepository } from '../repositories';
-import { authValidation } from '../middlewares/auth/auth-validation';
-import { BlogIdParamType, CreateBlogType } from '../models/blogs/input';
+import { PostRequestByIdType, HTTP_STATUSES, CreateRequestType, PutRequestType } from '../../../common/models';
+import { authValidation } from '../../../middlewares/auth/auth-validation';
+import { BlogIdParamType, CreateBlogType } from '../models/input';
 import { ObjectId } from 'mongodb';
+import { BlogRepository } from '../repositories/blog-repository';
+import { blogPostValidation } from '../validators/blog-validator';
 
 export const blogRoute = Router({});
 

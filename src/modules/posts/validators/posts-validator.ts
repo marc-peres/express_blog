@@ -1,8 +1,8 @@
 import { body } from 'express-validator';
-import { formattedErrorsValidation } from './formatted-errors-validation';
-import { authValidation } from '../middlewares/auth/auth-validation';
-import { BlogRepository } from '../repositories';
+import { formattedErrorsValidation } from '../../../common/validators/formatted-errors-validation';
+import { authValidation } from '../../../middlewares/auth/auth-validation';
 import { ObjectId } from 'mongodb';
+import { BlogRepository } from '../../blogs';
 
 export const postTitleValidation = body('title').isString().trim().isLength({ min: 1, max: 30 }).withMessage('Invalid title!');
 export const postShortDescriptionValidation = body('shortDescription')

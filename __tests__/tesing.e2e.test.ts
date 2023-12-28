@@ -1,5 +1,5 @@
 import request = require('supertest');
-import { HTTP_STATUSES } from '../src/models/common';
+import { HTTP_STATUSES } from '../src/common/models';
 import { app } from '../src/setting';
 import { MongoClient } from 'mongodb';
 
