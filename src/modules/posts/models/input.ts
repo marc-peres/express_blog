@@ -1,4 +1,4 @@
-export type CreatePostType = {
+export type InputCreatePostType = {
   title: string;
   shortDescription: string;
   content: string;

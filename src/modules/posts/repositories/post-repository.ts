@@ -1,68 +1,36 @@
 import { postsCollection } from '../../../db/db';
-import { CreatePostType } from '../models/input';
-import { PostItemType } from '../models/output';
-import { ObjectId } from 'mongodb';
-import { BlogItemType } from '../../blogs';
-import { postMapper } from '../mappers/postMapper';
+import { InputCreatePostType } from '../models/input';
+import { DeleteResult, InsertOneResult, ObjectId, OptionalId, UpdateResult, WithId } from 'mongodb';
+
+import { PostBdType } from '../../../db/models/db';
 
 export class PostRepository {
-  static async getAllPosts(): Promise<PostItemType[]> {
-    const posts = await postsCollection.find({}).toArray();
-    return posts.map(postMapper);
+  static async getAllPosts(): Promise<WithId<PostBdType>[]> {
+    return await postsCollection.find({}).toArray();
   }
 
-  static async findPostById(id: string): Promise<PostItemType | null> {
-    const post = await postsCollection.findOne({ _id: new ObjectId(id) });
-    if (!post) {
-      return null;
-    }
-
-    return postMapper(post);
+  static async findPostById(id: ObjectId): Promise<WithId<PostBdType> | null> {
+    return await postsCollection.findOne({ _id: id });
   }
 
-  static async createNewPost(createData: CreatePostType, currentBlog: BlogItemType): Promise<PostItemType> {
-    const createdAt = new Date().toISOString();
-    const post = await postsCollection.insertOne({
-      ...createData,
-      blogName: currentBlog?.name,
-      createdAt,
-    });
-
-    return {
-      ...createData,
-      blogName: currentBlog?.name,
-      createdAt,
-      id: post.insertedId.toString(),
-    };
+  static async createNewPost(newPost: OptionalId<PostBdType>): Promise<InsertOneResult<PostBdType>> {
+    return await postsCollection.insertOne(newPost);
   }
 
-  static async changePost(updatedData: CreatePostType, id: string): Promise<boolean> {
-    const post = await postsCollection.updateOne(
-      { _id: new ObjectId(id) },
+  static async changePost(id: ObjectId, updatedPost: InputCreatePostType): Promise<UpdateResult<PostBdType>> {
+    return await postsCollection.updateOne(
+      { _id: id },
       {
-        $set: {
-          title: updatedData.title,
-          shortDescription: updatedData.shortDescription,
-          content: updatedData.content,
-          blogId: updatedData.blogId,
-        },
+        $set: updatedPost,
       },
     );
-
-    return !!post.matchedCount;
   }
 
-  static async deletePostById(id: string): Promise<boolean> {
-    const post = await postsCollection.deleteOne({ _id: new ObjectId(id) });
-    return !!post.deletedCount;
+  static async deletePostById(id: ObjectId): Promise<DeleteResult> {
+    return await postsCollection.deleteOne({ _id: id });
   }
 
-  static async deleteAllPosts(): Promise<boolean> {
-    const postsLength = await postsCollection
-      .find({})
-      .toArray()
-      .then(res => res.length);
-    const post = await postsCollection.deleteMany({});
-    return postsLength === post.deletedCount;
+  static async deleteAllPosts(): Promise<DeleteResult> {
+    return await postsCollection.deleteMany({});
   }
 }
