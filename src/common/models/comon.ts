@@ -10,9 +10,10 @@ export const HTTP_STATUSES = {
   NOT_FOUND_404: 404,
 };
 
-export type PostRequestByIdType<I> = Request<I, {}, {}, {}>;
-export type CreateRequestType<I> = Request<{}, {}, I, {}>;
-export type PutRequestType<P, I> = Request<P, {}, I, {}>;
+export type RequestWithParamsType<P> = Request<P, {}, {}, {}>;
+export type RequestWithBodyType<B> = Request<{}, {}, B, {}>;
+export type RequestWithQueryType<Q> = Request<{}, {}, {}, Q>;
+export type RequestWithParamsAndBodyType<P, B> = Request<P, {}, B, {}>;
 
 export type ErrorMessage = {
   message: string;
