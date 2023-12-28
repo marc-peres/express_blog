@@ -1,9 +1,9 @@
-import { postsCollection } from '../db/db';
-import { CreatePostType } from '../models/posts/input';
-import { PostItemType } from '../models/posts/output';
-import { BlogItemType } from '../models/blogs/output';
-import { postMapper } from '../models/posts/mappers/postMapper';
+import { postsCollection } from '../../../db/db';
+import { CreatePostType } from '../models/input';
+import { PostItemType } from '../models/output';
 import { ObjectId } from 'mongodb';
+import { BlogItemType } from '../../blogs';
+import { postMapper } from '../mappers/postMapper';
 
 export class PostRepository {
   static async getAllPosts(): Promise<PostItemType[]> {

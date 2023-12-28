@@ -1,4 +1,4 @@
-import { BlogBdType, PostBdType } from '../models/db/db';
+import { BlogBdType, PostBdType } from './models/db';
 import dotenv from 'dotenv';
 import { MongoClient } from 'mongodb';
 

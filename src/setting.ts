@@ -1,8 +1,8 @@
 import express from 'express';
-import { homeRoute } from './routers/home-rote';
-import { blogRoute } from './routers/blogs-route';
-import { postsRoute } from './routers/post-route';
-import { testingRoute } from './routers/testing-rote';
+import { homeRoute } from './modules/home';
+import { blogRoute } from './modules/blogs';
+import { postsRoute } from './modules/posts';
+import { testingRoute } from './modules/testing';
 
 export const app = express();
 

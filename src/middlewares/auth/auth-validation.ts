@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import dotenv from 'dotenv';
-import { HTTP_STATUSES } from '../../models/common';
+import { HTTP_STATUSES } from '../../common/models';
 
 dotenv.config();
 export const authValidation = (req: Request, res: Response, next: NextFunction) => {
