@@ -20,8 +20,8 @@ describe('testing api tests', () => {
     await request(app).delete(`${testingPath}/all-data`).expect(HTTP_STATUSES.NO_CONTENT_204);
     const postsResponse = await request(app).get('/posts').expect(HTTP_STATUSES.OK_200);
     const blogsResponse = await request(app).get('/blogs').expect(HTTP_STATUSES.OK_200);
-    const postsList = postsResponse.body;
-    const blogsList = blogsResponse.body;
+    const postsList = postsResponse.body.items;
+    const blogsList = blogsResponse.body.items;
 
     expect(postsList).toBeInstanceOf(Array);
     expect(postsList).toHaveLength(0);

@@ -1,17 +1,32 @@
-import { PostItemType } from '../models/output';
+import { PostItemOutputType, PostPaginationOutputType } from '../models/output';
 import { postMapper } from '../mappers/postMapper';
 import { ObjectId } from 'mongodb';
-import { InputCreatePostType } from '../models/input';
-import { BlogItemType } from '../../blogs';
+import { InputCreatePostType, InputPostQueryType } from '../models/input';
 import { PostRepository } from '../repositories/post-repository';
 
 export class PostService {
-  static async getAllPosts(): Promise<PostItemType[]> {
-    const posts = await PostRepository.getAllPosts();
-    return posts.map(postMapper);
+  static async getAllPosts(sortData: InputPostQueryType): Promise<PostPaginationOutputType> {
+    const sortBy = sortData.sortBy ?? 'createdAt';
+    const sortDirection = sortData.sortDirection ?? 'desc';
+    const pageNumber = sortData.pageNumber ?? 1;
+    const pageSize = sortData.pageSize ?? 10;
+    const skipCount = (pageNumber - 1) * pageSize;
+
+    const posts = await PostRepository.getAllPosts({ sortBy, sortDirection, pagination: { skipCount, limitCount: pageSize } });
+
+    const totalCount = await PostRepository.getTotalPostsCount();
+    const pagesCount = Math.ceil(totalCount / pageSize);
+
+    return {
+      page: pageNumber,
+      pageSize,
+      totalCount,
+      pagesCount,
+      items: posts.map(postMapper),
+    };
   }
 
-  static async findPostById(id: string): Promise<PostItemType | null> {
+  static async findPostById(id: string): Promise<PostItemOutputType | null> {
     const searchedId = new ObjectId(id);
     const post = await await PostRepository.findPostById(searchedId);
 
@@ -22,11 +37,11 @@ export class PostService {
     return postMapper(post);
   }
 
-  static async createNewPost(createData: InputCreatePostType, currentBlog: BlogItemType): Promise<PostItemType> {
+  static async createNewPost(createData: InputCreatePostType, blogName: string): Promise<PostItemOutputType> {
     const createdAt = new Date().toISOString();
     const newPost = {
       ...createData,
-      blogName: currentBlog?.name,
+      blogName,
       createdAt,
     };
     const post = await PostRepository.createNewPost({ ...newPost });
@@ -57,8 +72,7 @@ export class PostService {
   }
 
   static async deleteAllPosts(): Promise<boolean> {
-    const posts = await PostRepository.getAllPosts();
-    const postsLength = posts.length;
+    const postsLength = await PostRepository.getTotalPostsCount({});
     const post = await PostRepository.deleteAllPosts();
     return postsLength === post.deletedCount;
   }

@@ -1,10 +1,28 @@
 import { blogsCollection } from '../../../db/db';
-import { DeleteResult, InsertOneResult, ObjectId, OptionalId, UpdateResult, WithId } from 'mongodb';
+import { DeleteResult, Filter, InsertOneResult, ObjectId, OptionalId, UpdateResult, WithId } from 'mongodb';
 import { InputCreateBlogType } from '../models/input';
 import { BlogBdType } from '../../../db/models/db';
+import { GetAllBlogsWithFilterSortAndPagination } from '../models/repositoryModels';
 export class BlogRepository {
-  static async getAllBlogs(): Promise<WithId<BlogBdType>[]> {
-    return await blogsCollection.find({}).toArray();
+  static async getAllBlogs({
+    filter = {},
+    sortBy = 'createdAt',
+    sortDirection = 'desc',
+    pagination,
+  }: GetAllBlogsWithFilterSortAndPagination): Promise<WithId<BlogBdType>[]> {
+    if (pagination) {
+      return await blogsCollection
+        .find(filter)
+        .sort(sortBy, sortDirection)
+        .skip(pagination.skipCount)
+        .limit(pagination.skipCount)
+        .toArray();
+    }
+    return await blogsCollection.find(filter).sort(sortBy, sortDirection).toArray();
+  }
+
+  static async getTotalBlogsCount(filter?: Filter<BlogBdType>): Promise<number> {
+    return await blogsCollection.countDocuments(filter);
   }
 
   static async findBlogById(id: ObjectId): Promise<WithId<BlogBdType> | null> {
