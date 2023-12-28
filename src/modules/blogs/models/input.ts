@@ -1,4 +1,4 @@
-export type CreateBlogType = {
+export type InputCreateBlogType = {
   name: string;
   description: string;
   websiteUrl: string;

@@ -1,6 +1,7 @@
 import { BlogRepository } from './repositories/blog-repository';
 import { BlogItemType } from './models/output';
-import { CreateBlogType, BlogIdParamType } from './models/input';
+import { InputCreateBlogType, BlogIdParamType } from './models/input';
 import { blogRoute } from './routes/blogs-route';
+import { BlogService } from './service/blogService';
 
-export { BlogRepository, CreateBlogType, BlogIdParamType, BlogItemType, blogRoute };
+export { BlogRepository, InputCreateBlogType, BlogIdParamType, BlogItemType, blogRoute, BlogService };

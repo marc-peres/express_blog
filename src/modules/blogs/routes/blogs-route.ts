@@ -1,22 +1,16 @@
 import { Request, Response, Router } from 'express';
 import { PostRequestByIdType, HTTP_STATUSES, CreateRequestType, PutRequestType } from '../../../common/models';
 import { authValidation } from '../../../middlewares/auth/auth-validation';
-import { BlogIdParamType, CreateBlogType } from '../models/input';
+import { BlogIdParamType, InputCreateBlogType } from '../models/input';
 import { ObjectId } from 'mongodb';
-import { BlogRepository } from '../repositories/blog-repository';
 import { blogPostValidation } from '../validators/blog-validator';
+import { BlogService } from '../service/blogService';
 
 export const blogRoute = Router({});
 
 blogRoute.get('/', async (req: Request, res: Response) => {
-  const allVideos = await BlogRepository.getAllBlogs();
+  const allVideos = await BlogService.getAllBlogs();
   res.send(allVideos);
-});
-
-blogRoute.post('/', blogPostValidation(), async (req: CreateRequestType<CreateBlogType>, res: Response) => {
-  const { name, websiteUrl, description } = req.body;
-  const newVideo = await BlogRepository.createNewBlog({ name, websiteUrl, description });
-  res.status(HTTP_STATUSES.CREATED_201).send(newVideo);
 });
 
 blogRoute.get('/:id', async (req: PostRequestByIdType<BlogIdParamType>, res: Response) => {
@@ -27,7 +21,7 @@ blogRoute.get('/:id', async (req: PostRequestByIdType<BlogIdParamType>, res: Res
     return;
   }
 
-  const requestedBlog = await BlogRepository.findBlogById(id);
+  const requestedBlog = await BlogService.findBlogById(id);
   if (!requestedBlog) {
     res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
     return;
@@ -35,7 +29,13 @@ blogRoute.get('/:id', async (req: PostRequestByIdType<BlogIdParamType>, res: Res
   res.send(requestedBlog);
 });
 
-blogRoute.put('/:id', blogPostValidation(), async (req: PutRequestType<BlogIdParamType, CreateBlogType>, res: Response) => {
+blogRoute.post('/', blogPostValidation(), async (req: CreateRequestType<InputCreateBlogType>, res: Response) => {
+  const { name, websiteUrl, description } = req.body;
+  const newVideo = await BlogService.createNewBlog({ name, websiteUrl, description });
+  res.status(HTTP_STATUSES.CREATED_201).send(newVideo);
+});
+
+blogRoute.put('/:id', blogPostValidation(), async (req: PutRequestType<BlogIdParamType, InputCreateBlogType>, res: Response) => {
   const { name, websiteUrl, description } = req.body;
   const id = req.params.id;
 
@@ -44,12 +44,12 @@ blogRoute.put('/:id', blogPostValidation(), async (req: PutRequestType<BlogIdPar
     return;
   }
 
-  const result = await BlogRepository.updateBlog({ name, websiteUrl, description }, id);
+  const result = await BlogService.updateBlog({ name, websiteUrl, description }, id);
   result ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204) : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
 });
 
 blogRoute.delete('/all-blogs', async (req: Request, res: Response) => {
-  const result = await BlogRepository.deleteAllBlogs();
+  const result = await BlogService.deleteAllBlogs();
   result ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204) : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
 });
 
@@ -59,7 +59,7 @@ blogRoute.delete('/:id', authValidation, async (req: Request, res: Response) => 
     res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
     return;
   }
-  const result = await BlogRepository.deleteBlogById(id);
+  const result = await BlogService.deleteBlogById(id);
 
   result ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204) : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
 });
