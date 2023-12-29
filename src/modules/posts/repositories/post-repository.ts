@@ -10,20 +10,13 @@ export class PostRepository {
     filter = {},
     sortBy = 'createdAt',
     sortDirection = 'desc',
-    pagination,
+    skipCount,
+    pageSize,
   }: GetAllPostsWithFilterSort): Promise<WithId<PostBdType>[]> {
-    if (pagination) {
-      return await postsCollection
-        .find(filter)
-        .sort(sortBy, sortDirection)
-        .skip(pagination.skipCount)
-        .limit(pagination.limitCount)
-        .toArray();
-    }
-    return await postsCollection.find(filter).sort(sortBy, sortDirection).toArray();
+    return await postsCollection.find(filter).sort(sortBy, sortDirection).skip(skipCount).limit(+pageSize).toArray();
   }
 
-  static async getTotalPostsCount(filter?: Filter<PostBdType>): Promise<number> {
+  static async getTotalPostsCount(filter: Filter<PostBdType>): Promise<number> {
     return await postsCollection.countDocuments(filter);
   }
 

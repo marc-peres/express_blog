@@ -21,16 +21,16 @@ export class PostService {
       };
     }
 
-    const posts = await PostRepository.getAllPosts({ filter, sortBy, sortDirection, pagination: { skipCount, limitCount: pageSize } });
+    const posts = await PostRepository.getAllPosts({ filter, sortBy, sortDirection, skipCount, pageSize });
 
-    const totalCount = await PostRepository.getTotalPostsCount();
+    const totalCount = await PostRepository.getTotalPostsCount(filter);
     const pagesCount = Math.ceil(totalCount / pageSize);
 
     return {
-      page: pageNumber,
-      pageSize,
-      totalCount,
       pagesCount,
+      page: +pageNumber,
+      pageSize: +pageSize,
+      totalCount,
       items: posts.map(postMapper),
     };
   }

@@ -5,8 +5,6 @@ export type GetAllBlogsWithFilterSortAndPagination = {
   filter?: Filter<BlogBdType>;
   sortBy?: string;
   sortDirection?: SortDirection;
-  pagination?: {
-    skipCount: number;
-    limitCount: number;
-  };
+  skipCount: number;
+  pageSize: number;
 };

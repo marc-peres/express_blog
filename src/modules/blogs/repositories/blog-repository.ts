@@ -8,17 +8,10 @@ export class BlogRepository {
     filter = {},
     sortBy = 'createdAt',
     sortDirection = 'desc',
-    pagination,
+    skipCount,
+    pageSize,
   }: GetAllBlogsWithFilterSortAndPagination): Promise<WithId<BlogBdType>[]> {
-    if (pagination) {
-      return await blogsCollection
-        .find(filter)
-        .sort(sortBy, sortDirection)
-        .skip(pagination.skipCount)
-        .limit(pagination.skipCount)
-        .toArray();
-    }
-    return await blogsCollection.find(filter).sort(sortBy, sortDirection).toArray();
+    return await blogsCollection.find(filter).sort(sortBy, sortDirection).skip(skipCount).limit(+pageSize).toArray();
   }
 
   static async getTotalBlogsCount(filter?: Filter<BlogBdType>): Promise<number> {
