@@ -27,10 +27,8 @@ export class BlogService {
       filter,
       sortBy,
       sortDirection,
-      pagination: {
-        limitCount: pageSize,
-        skipCount,
-      },
+      pageSize,
+      skipCount,
     });
 
     const totalCount = await BlogRepository.getTotalBlogsCount(filter);
@@ -38,8 +36,8 @@ export class BlogService {
 
     return {
       pagesCount,
-      page: pageNumber,
-      pageSize,
+      page: +pageNumber,
+      pageSize: +pageSize,
       totalCount,
       items: blogs.map(blogMapper),
     };

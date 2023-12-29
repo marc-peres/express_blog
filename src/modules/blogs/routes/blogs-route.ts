@@ -73,8 +73,10 @@ blogRoute.get('/:id/posts', async (req: RequestWithParamsAndQueryType<BlogIdPara
 blogRoute.post(
   '/:id/posts',
   CreatePostByBlogIdValidation(),
-  async (req: RequestWithParamsAndQueryType<BlogIdParamType, InputCreatePostByBlogIdType>, res: Response) => {
-    const { content, title, shortDescription } = req.query;
+  async (req: RequestWithParamsAndBodyType<BlogIdParamType, InputCreatePostByBlogIdType>, res: Response) => {
+    const content = req.body.content;
+    const title = req.body.title;
+    const shortDescription = req.body.shortDescription;
     const blogId = req.params.id;
 
     if (!ObjectId.isValid(blogId)) {

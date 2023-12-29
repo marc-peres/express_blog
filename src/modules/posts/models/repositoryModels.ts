@@ -5,8 +5,6 @@ export type GetAllPostsWithFilterSort = {
   filter?: Filter<PostBdType>;
   sortBy?: string;
   sortDirection?: SortDirection;
-  pagination?: {
-    skipCount: number;
-    limitCount: number;
-  };
+  skipCount: number;
+  pageSize: number;
 };
