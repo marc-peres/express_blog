@@ -1,7 +1,7 @@
 import request = require('supertest');
-import { HTTP_STATUSES } from '../src/common/models';
-import { headersTestConfig } from './config';
-import { app } from '../src/setting';
+import { HTTP_STATUSES } from '../../src/common/models';
+import { headersTestConfig } from '../config';
+import { app } from '../../src/setting';
 import { MongoClient } from 'mongodb';
 
 const testingPath = '/blogs';
@@ -151,7 +151,7 @@ describe('blogs api tests', () => {
       .expect(HTTP_STATUSES.CREATED_201);
     const createdBlog = response.body;
 
-    await request(app).delete(`${testingPath}/${123}`).set(headersTestConfig).expect(HTTP_STATUSES.NOT_FOUND_404);
+    await request(app).delete(`${testingPath}/${123}`).set(headersTestConfig).expect(HTTP_STATUSES.BAD_REQUEST_400);
     await request(app).delete(`${testingPath}/${createdBlog.id}`).set(headersTestConfig).expect(HTTP_STATUSES.NO_CONTENT_204);
 
     await request(app).get(`${testingPath}/${createdBlog.id}`).set(headersTestConfig).expect(HTTP_STATUSES.NOT_FOUND_404);

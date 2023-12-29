@@ -12,4 +12,5 @@ export type InputPostQueryType = {
   sortDirection?: SortDirection;
   pageNumber?: number;
   pageSize?: number;
+  blogId?: string;
 };

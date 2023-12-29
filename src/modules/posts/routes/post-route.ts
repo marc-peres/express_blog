@@ -55,8 +55,8 @@ postsRoute.post('/', createPostValidation(), async (req: RequestWithBodyType<Inp
     res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
     return;
   }
-  const newVideo = await PostService.createNewPost({ blogId, content, shortDescription, title }, currentBlog.name);
-  res.status(HTTP_STATUSES.CREATED_201).send(newVideo);
+  const newPost = await PostService.createNewPost({ blogId, content, shortDescription, title }, currentBlog.name);
+  res.status(HTTP_STATUSES.CREATED_201).send(newPost);
 });
 
 postsRoute.put(

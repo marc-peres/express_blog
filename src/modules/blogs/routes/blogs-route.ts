@@ -7,10 +7,12 @@ import {
   RequestWithQueryType,
 } from '../../../common/models';
 import { authValidation } from '../../../middlewares/auth/auth-validation';
-import { BlogIdParamType, InputBlogWithQueryType, InputCreateBlogType } from '../models/input';
+import { BlogIdParamType, InputBlogWithQueryType, InputCreateBlogType, InputCreatePostByBlogIdType } from '../models/input';
 import { ObjectId } from 'mongodb';
-import { blogPostValidation } from '../validators/blog-validator';
+import { blogPostValidation, CreatePostByBlogIdValidation } from '../validators/blog-validator';
 import { BlogService } from '../service/blogService';
+import { RequestWithParamsAndQueryType } from '../../../common/models/comon';
+import { PostService } from '../../posts/service/postService';
 
 export const blogRoute = Router({});
 
@@ -31,7 +33,7 @@ blogRoute.get('/:id', async (req: RequestWithParamsType<BlogIdParamType>, res: R
   const id = req.params.id;
 
   if (!ObjectId.isValid(id)) {
-    res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+    res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
     return;
   }
 
@@ -42,6 +44,53 @@ blogRoute.get('/:id', async (req: RequestWithParamsType<BlogIdParamType>, res: R
   }
   res.send(requestedBlog);
 });
+
+blogRoute.get('/:id/posts', async (req: RequestWithParamsAndQueryType<BlogIdParamType, InputBlogWithQueryType>, res: Response) => {
+  const blogId = req.params.id;
+  if (!ObjectId.isValid(blogId)) {
+    res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
+    return;
+  }
+
+  const sortData: InputBlogWithQueryType = {
+    sortBy: req.query.sortBy,
+    sortDirection: req.query.sortDirection,
+    pageNumber: req.query.pageNumber,
+    pageSize: req.query.pageSize,
+    blogId,
+  };
+
+  const requestedBlog = await BlogService.findBlogById(blogId);
+  if (!requestedBlog) {
+    res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+    return;
+  }
+
+  const allPostsByBlogId = await PostService.getAllPosts(sortData);
+  res.send(allPostsByBlogId);
+});
+
+blogRoute.post(
+  '/:id/posts',
+  CreatePostByBlogIdValidation(),
+  async (req: RequestWithParamsAndQueryType<BlogIdParamType, InputCreatePostByBlogIdType>, res: Response) => {
+    const { content, title, shortDescription } = req.query;
+    const blogId = req.params.id;
+
+    if (!ObjectId.isValid(blogId)) {
+      res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
+      return;
+    }
+    const currentBlog = await BlogService.findBlogById(blogId);
+
+    if (!currentBlog) {
+      res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+      return;
+    }
+    const newPost = await PostService.createNewPost({ blogId, content, shortDescription, title }, currentBlog.name);
+    res.status(HTTP_STATUSES.CREATED_201).send(newPost);
+  },
+);
 
 blogRoute.post('/', blogPostValidation(), async (req: RequestWithBodyType<InputCreateBlogType>, res: Response) => {
   const { name, websiteUrl, description } = req.body;
@@ -57,7 +106,7 @@ blogRoute.put(
     const id = req.params.id;
 
     if (!ObjectId.isValid(id)) {
-      res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+      res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
       return;
     }
 
@@ -74,7 +123,7 @@ blogRoute.delete('/all-blogs', async (req: Request, res: Response) => {
 blogRoute.delete('/:id', authValidation, async (req: Request, res: Response) => {
   const id = req.params.id;
   if (!ObjectId.isValid(id)) {
-    res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+    res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
     return;
   }
   const result = await BlogService.deleteBlogById(id);
