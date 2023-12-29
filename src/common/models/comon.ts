@@ -13,6 +13,7 @@ export const HTTP_STATUSES = {
 export type RequestWithParamsType<P> = Request<P, {}, {}, {}>;
 export type RequestWithBodyType<B> = Request<{}, {}, B, {}>;
 export type RequestWithQueryType<Q> = Request<{}, {}, {}, Q>;
+export type RequestWithParamsAndQueryType<P, Q> = Request<P, {}, {}, Q>;
 export type RequestWithParamsAndBodyType<P, B> = Request<P, {}, B, {}>;
 
 export type ErrorMessage = {

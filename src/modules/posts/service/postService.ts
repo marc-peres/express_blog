@@ -6,13 +6,22 @@ import { PostRepository } from '../repositories/post-repository';
 
 export class PostService {
   static async getAllPosts(sortData: InputPostQueryType): Promise<PostPaginationOutputType> {
+    const blogId = sortData.blogId ?? '';
     const sortBy = sortData.sortBy ?? 'createdAt';
     const sortDirection = sortData.sortDirection ?? 'desc';
     const pageNumber = sortData.pageNumber ?? 1;
     const pageSize = sortData.pageSize ?? 10;
     const skipCount = (pageNumber - 1) * pageSize;
 
-    const posts = await PostRepository.getAllPosts({ sortBy, sortDirection, pagination: { skipCount, limitCount: pageSize } });
+    let filter = {};
+
+    if (blogId) {
+      filter = {
+        blogId,
+      };
+    }
+
+    const posts = await PostRepository.getAllPosts({ filter, sortBy, sortDirection, pagination: { skipCount, limitCount: pageSize } });
 
     const totalCount = await PostRepository.getTotalPostsCount();
     const pagesCount = Math.ceil(totalCount / pageSize);

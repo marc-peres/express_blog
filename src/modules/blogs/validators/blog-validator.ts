@@ -1,6 +1,7 @@
 import { body } from 'express-validator';
 import { authValidation } from '../../../middlewares/auth/auth-validation';
 import { formattedErrorsValidation } from '../../../common/validators';
+import { postContentValidation, postShortDescriptionValidation, postTitleValidation } from '../../posts';
 
 export const nameValidation = body('name').isString().trim().isLength({ min: 1, max: 15 }).withMessage('Invalid name!');
 export const descriptionValidation = body('description')
@@ -20,5 +21,13 @@ export const blogPostValidation = () => [
   nameValidation,
   descriptionValidation,
   websiteUrlValidation,
+  formattedErrorsValidation,
+];
+
+export const CreatePostByBlogIdValidation = () => [
+  authValidation,
+  postTitleValidation,
+  postShortDescriptionValidation,
+  postContentValidation,
   formattedErrorsValidation,
 ];

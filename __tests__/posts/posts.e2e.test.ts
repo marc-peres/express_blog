@@ -1,7 +1,7 @@
 import request = require('supertest');
-import { HTTP_STATUSES } from '../src/common/models';
-import { headersTestConfig } from './config';
-import { app } from '../src/setting';
+import { HTTP_STATUSES } from '../../src/common/models';
+import { headersTestConfig } from '../config';
+import { app } from '../../src/setting';
 import { MongoClient } from 'mongodb';
 
 const testingPath = '/posts';
