@@ -1,59 +1,9 @@
-import { BlogItemOutputType, BlogPaginationOutputType } from '../models/output';
-import { blogMapper } from '../mappers/mapper';
+import { BlogItemOutputType } from '../models/output';
 import { ObjectId } from 'mongodb';
-import { InputBlogWithQueryType, InputCreateBlogType } from '../models/input';
+import { InputCreateBlogType } from '../models/input';
 import { BlogRepository } from '../repositories/blog-repository';
+import { BlogQueryRepository } from '../repositories/blog-queryRepository';
 export class BlogService {
-  static async getAllBlogs(sortData: InputBlogWithQueryType): Promise<BlogPaginationOutputType> {
-    const searchNameTerm = sortData.searchNameTerm ?? null;
-    const sortBy = sortData.sortBy ?? 'createdAt';
-    const sortDirection = sortData.sortDirection ?? 'desc';
-    const pageNumber = sortData.pageNumber ?? 1;
-    const pageSize = sortData.pageSize ?? 10;
-    const skipCount = (pageNumber - 1) * pageSize;
-
-    let filter = {};
-
-    if (searchNameTerm) {
-      filter = {
-        name: {
-          $regex: searchNameTerm,
-          $options: 'i',
-        },
-      };
-    }
-
-    const blogs = await BlogRepository.getAllBlogs({
-      filter,
-      sortBy,
-      sortDirection,
-      pageSize,
-      skipCount,
-    });
-
-    const totalCount = await BlogRepository.getTotalBlogsCount(filter);
-    const pagesCount = Math.ceil(totalCount / pageSize);
-
-    return {
-      pagesCount,
-      page: +pageNumber,
-      pageSize: +pageSize,
-      totalCount,
-      items: blogs.map(blogMapper),
-    };
-  }
-
-  static async findBlogById(id: string): Promise<BlogItemOutputType | null> {
-    const searchedId = new ObjectId(id);
-    const blog = await BlogRepository.findBlogById(searchedId);
-
-    if (!blog) {
-      return null;
-    }
-
-    return blogMapper(blog);
-  }
-
   static async createNewBlog(createData: InputCreateBlogType): Promise<BlogItemOutputType> {
     const createdAt = new Date().toISOString();
     const newBlog = {
@@ -92,7 +42,7 @@ export class BlogService {
   }
 
   static async deleteAllBlogs(): Promise<boolean> {
-    const blogsCount = await BlogRepository.getTotalBlogsCount({});
+    const blogsCount = await BlogQueryRepository.getTotalBlogsCount({});
     const deletedResult = await BlogRepository.deleteAllBlogs();
     return deletedResult.deletedCount === blogsCount;
   }

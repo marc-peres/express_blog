@@ -13,6 +13,8 @@ import { blogPostValidation, CreatePostByBlogIdValidation } from '../validators/
 import { BlogService } from '../service/blogService';
 import { RequestWithParamsAndQueryType } from '../../../common/models/comon';
 import { PostService } from '../../posts/service/postService';
+import { BlogQueryRepository } from '../repositories/blog-queryRepository';
+import { PostQueryRepository } from '../../posts/repositories/post-queryRepository';
 
 export const blogRoute = Router({});
 
@@ -25,7 +27,7 @@ blogRoute.get('/', async (req: RequestWithQueryType<InputBlogWithQueryType>, res
     pageSize: req.query.pageSize,
   };
 
-  const allVideos = await BlogService.getAllBlogs(sortData);
+  const allVideos = await BlogQueryRepository.getAllBlogs(sortData);
   res.send(allVideos);
 });
 
@@ -37,7 +39,7 @@ blogRoute.get('/:id', async (req: RequestWithParamsType<BlogIdParamType>, res: R
     return;
   }
 
-  const requestedBlog = await BlogService.findBlogById(id);
+  const requestedBlog = await BlogQueryRepository.findBlogById(id);
   if (!requestedBlog) {
     res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
     return;
@@ -60,13 +62,13 @@ blogRoute.get('/:id/posts', async (req: RequestWithParamsAndQueryType<BlogIdPara
     blogId,
   };
 
-  const requestedBlog = await BlogService.findBlogById(blogId);
+  const requestedBlog = await BlogQueryRepository.findBlogById(blogId);
   if (!requestedBlog) {
     res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
     return;
   }
 
-  const allPostsByBlogId = await PostService.getAllPosts(sortData);
+  const allPostsByBlogId = await PostQueryRepository.getAllPosts(sortData);
   res.send(allPostsByBlogId);
 });
 
@@ -83,7 +85,7 @@ blogRoute.post(
       res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
       return;
     }
-    const currentBlog = await BlogService.findBlogById(blogId);
+    const currentBlog = await BlogQueryRepository.findBlogById(blogId);
 
     if (!currentBlog) {
       res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
