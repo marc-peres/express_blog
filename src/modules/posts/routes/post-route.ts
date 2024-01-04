@@ -10,8 +10,10 @@ import { authValidation } from '../../../middlewares/auth/auth-validation';
 import { createPostValidation } from '../validators/posts-validator';
 import { InputCreatePostType, InputPostQueryType } from '../models/input';
 import { ObjectId } from 'mongodb';
-import { BlogIdParamType, BlogService } from '../../blogs';
+import { BlogIdParamType } from '../../blogs';
 import { PostService } from '../service/postService';
+import { PostQueryRepository } from '../repositories/post-queryRepository';
+import { BlogQueryRepository } from '../../blogs/repositories/blog-queryRepository';
 
 export const postsRoute = Router({});
 
@@ -22,7 +24,7 @@ postsRoute.get('/', async (req: RequestWithQueryType<InputPostQueryType>, res: R
     pageSize: req.query.pageSize,
     pageNumber: req.query.pageNumber,
   };
-  const allPosts = await PostService.getAllPosts(sortData);
+  const allPosts = await PostQueryRepository.getAllPosts(sortData);
   res.send(allPosts);
 });
 
@@ -34,7 +36,7 @@ postsRoute.get('/:id', async (req: RequestWithParamsType<BlogIdParamType>, res: 
     return;
   }
 
-  const requestedPost = await PostService.findPostById(id);
+  const requestedPost = await PostQueryRepository.findPostById(id);
   if (!requestedPost) {
     res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
     return;
@@ -50,7 +52,7 @@ postsRoute.post('/', createPostValidation(), async (req: RequestWithBodyType<Inp
     return;
   }
 
-  const currentBlog = await BlogService.findBlogById(blogId);
+  const currentBlog = await BlogQueryRepository.findBlogById(blogId);
   if (!currentBlog) {
     res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
     return;
@@ -84,7 +86,7 @@ postsRoute.delete('/:id', authValidation, async (req: Request, res: Response) =>
     return;
   }
 
-  const requestedPost = await PostService.findPostById(id);
+  const requestedPost = await PostQueryRepository.findPostById(id);
   if (!requestedPost) {
     res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
     return;

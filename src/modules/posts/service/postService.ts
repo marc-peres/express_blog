@@ -1,51 +1,10 @@
-import { PostItemOutputType, PostPaginationOutputType } from '../models/output';
-import { postMapper } from '../mappers/postMapper';
+import { PostItemOutputType } from '../models/output';
 import { ObjectId } from 'mongodb';
-import { InputCreatePostType, InputPostQueryType } from '../models/input';
+import { InputCreatePostType } from '../models/input';
 import { PostRepository } from '../repositories/post-repository';
+import { PostQueryRepository } from '../repositories/post-queryRepository';
 
 export class PostService {
-  static async getAllPosts(sortData: InputPostQueryType): Promise<PostPaginationOutputType> {
-    const blogId = sortData.blogId ?? '';
-    const sortBy = sortData.sortBy ?? 'createdAt';
-    const sortDirection = sortData.sortDirection ?? 'desc';
-    const pageNumber = sortData.pageNumber ?? 1;
-    const pageSize = sortData.pageSize ?? 10;
-    const skipCount = (pageNumber - 1) * pageSize;
-
-    let filter = {};
-
-    if (blogId) {
-      filter = {
-        blogId,
-      };
-    }
-
-    const posts = await PostRepository.getAllPosts({ filter, sortBy, sortDirection, skipCount, pageSize });
-
-    const totalCount = await PostRepository.getTotalPostsCount(filter);
-    const pagesCount = Math.ceil(totalCount / pageSize);
-
-    return {
-      pagesCount,
-      page: +pageNumber,
-      pageSize: +pageSize,
-      totalCount,
-      items: posts.map(postMapper),
-    };
-  }
-
-  static async findPostById(id: string): Promise<PostItemOutputType | null> {
-    const searchedId = new ObjectId(id);
-    const post = await await PostRepository.findPostById(searchedId);
-
-    if (!post) {
-      return null;
-    }
-
-    return postMapper(post);
-  }
-
   static async createNewPost(createData: InputCreatePostType, blogName: string): Promise<PostItemOutputType> {
     const createdAt = new Date().toISOString();
     const newPost = {
@@ -81,7 +40,7 @@ export class PostService {
   }
 
   static async deleteAllPosts(): Promise<boolean> {
-    const postsLength = await PostRepository.getTotalPostsCount({});
+    const postsLength = await PostQueryRepository.getTotalPostsCount({});
     const post = await PostRepository.deleteAllPosts();
     return postsLength === post.deletedCount;
   }
