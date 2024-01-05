@@ -6,14 +6,14 @@ import {
   RequestWithParamsAndBodyType,
   RequestWithQueryType,
 } from '../../../common/models';
-import { authValidation } from '../../../middlewares/auth/auth-validation';
-import { createPostValidation } from '../validators/posts-validator';
+import { authValidation } from '../../../middlewares/auth/authValidation';
+import { createPostValidation } from '../validators/postsValidator';
 import { InputCreatePostType, InputPostQueryType } from '../models/input';
 import { ObjectId } from 'mongodb';
 import { BlogIdParamType } from '../../blogs';
 import { PostService } from '../service/postService';
-import { PostQueryRepository } from '../repositories/post-queryRepository';
-import { BlogQueryRepository } from '../../blogs/repositories/blog-queryRepository';
+import { PostQueryRepository } from '../repositories/postQueryRepository';
+import { BlogQueryRepository } from '../../blogs/repositories/blogQueryRepository';
 
 export const postsRoute = Router({});
 

@@ -1,4 +1,4 @@
-import { idValidation } from './common-validation';
-import { formattedErrorsValidation } from './formatted-errors-validation';
+import { idValidation } from './commonValidation';
+import { formattedErrorsValidation } from './formattedErrorsValidation';
 
 export { idValidation, formattedErrorsValidation };

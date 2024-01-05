@@ -1,8 +1,8 @@
 import { PostItemOutputType } from '../models/output';
 import { ObjectId } from 'mongodb';
 import { InputCreatePostType } from '../models/input';
-import { PostRepository } from '../repositories/post-repository';
-import { PostQueryRepository } from '../repositories/post-queryRepository';
+import { PostRepository } from '../repositories/postRepository';
+import { PostQueryRepository } from '../repositories/postQueryRepository';
 
 export class PostService {
   static async createNewPost(createData: InputCreatePostType, blogName: string): Promise<PostItemOutputType> {

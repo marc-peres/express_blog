@@ -1,5 +1,5 @@
 import { body } from 'express-validator';
-import { authValidation } from '../../../middlewares/auth/auth-validation';
+import { authValidation } from '../../../middlewares/auth/authValidation';
 import { formattedErrorsValidation } from '../../../common/validators';
 import { postContentValidation, postShortDescriptionValidation, postTitleValidation } from '../../posts';
 

@@ -1,9 +1,9 @@
-import { PostRepository } from './repositories/post-repository';
+import { PostRepository } from './repositories/postRepository';
 import { postMapper } from './mappers/postMapper';
 import { InputCreatePostType } from './models/input';
 import { PostItemOutputType } from './models/output';
-import { postsRoute } from './routes/post-route';
-import { postContentValidation, postShortDescriptionValidation, postTitleValidation } from './validators/posts-validator';
+import { postsRoute } from './routes/postRoute';
+import { postContentValidation, postShortDescriptionValidation, postTitleValidation } from './validators/postsValidator';
 
 export {
   PostRepository,
