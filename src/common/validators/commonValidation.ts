@@ -1,5 +1,5 @@
 import { param } from 'express-validator';
-import { formattedErrorsValidation } from './formatted-errors-validation';
+import { formattedErrorsValidation } from './formattedErrorsValidation';
 
 export const idValidation = param('id').isString().trim().notEmpty().withMessage('Invalid id');
 

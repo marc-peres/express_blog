@@ -1,3 +1,3 @@
-import { testingRoute } from './routes/testing-rote';
+import { testingRoute } from './routes/testingRote';
 
 export { testingRoute };

@@ -6,15 +6,15 @@ import {
   RequestWithParamsAndBodyType,
   RequestWithQueryType,
 } from '../../../common/models';
-import { authValidation } from '../../../middlewares/auth/auth-validation';
+import { authValidation } from '../../../middlewares/auth/authValidation';
 import { BlogIdParamType, InputBlogWithQueryType, InputCreateBlogType, InputCreatePostByBlogIdType } from '../models/input';
 import { ObjectId } from 'mongodb';
-import { blogPostValidation, CreatePostByBlogIdValidation } from '../validators/blog-validator';
+import { blogPostValidation, CreatePostByBlogIdValidation } from '../validators/blogValidator';
 import { BlogService } from '../service/blogService';
 import { RequestWithParamsAndQueryType } from '../../../common/models/comon';
 import { PostService } from '../../posts/service/postService';
-import { BlogQueryRepository } from '../repositories/blog-queryRepository';
-import { PostQueryRepository } from '../../posts/repositories/post-queryRepository';
+import { BlogQueryRepository } from '../repositories/blogQueryRepository';
+import { PostQueryRepository } from '../../posts/repositories/postQueryRepository';
 
 export const blogRoute = Router({});
 

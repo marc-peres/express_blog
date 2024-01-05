@@ -13,3 +13,10 @@ export type PostBdType = {
   blogName: string;
   createdAt: string;
 };
+export type UsersBdType = {
+  login: string;
+  email: string;
+  createdAt: string;
+  passwordSalt: string;
+  passwordHash: string;
+};

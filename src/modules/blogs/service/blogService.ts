@@ -1,8 +1,8 @@
 import { BlogItemOutputType } from '../models/output';
 import { ObjectId } from 'mongodb';
 import { InputCreateBlogType } from '../models/input';
-import { BlogRepository } from '../repositories/blog-repository';
-import { BlogQueryRepository } from '../repositories/blog-queryRepository';
+import { BlogRepository } from '../repositories/blogRepository';
+import { BlogQueryRepository } from '../repositories/blogQueryRepository';
 export class BlogService {
   static async createNewBlog(createData: InputCreateBlogType): Promise<BlogItemOutputType> {
     const createdAt = new Date().toISOString();
