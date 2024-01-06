@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import { postUserValidation, queryUsersValidator } from '../validators/usersValidators';
-import { HTTP_STATUSES, RequestWithBodyType, RequestWithParamsType } from '../../../common/models';
+import { HTTP_STATUSES, RequestWithBodyType, RequestWithParamsType, RequestWithQueryType } from '../../../common/models';
 import { InputPostUsersType, InputUsersWithQueryType, UserIdParamType } from '../models/input';
 import { UserQueryRepository } from '../repositories/userQueryRepository';
 import { UserService } from '../service/userService';
@@ -8,14 +8,14 @@ import { ObjectId } from 'mongodb';
 
 export const userRoute = Router({});
 
-userRoute.get('/', queryUsersValidator(), async (req: RequestWithBodyType<InputUsersWithQueryType>, res: Response) => {
+userRoute.get('/', queryUsersValidator(), async (req: RequestWithQueryType<InputUsersWithQueryType>, res: Response) => {
   const sortData: InputUsersWithQueryType = {
-    sortBy: req.body.sortBy,
-    sortDirection: req.body.sortDirection,
-    pageSize: req.body.pageSize,
-    pageNumber: req.body.pageNumber,
-    searchEmailTerm: req.body.searchEmailTerm,
-    searchLoginTerm: req.body.searchLoginTerm,
+    sortBy: req.query.sortBy,
+    sortDirection: req.query.sortDirection,
+    pageSize: req.query.pageSize,
+    pageNumber: req.query.pageNumber,
+    searchEmailTerm: req.query.searchEmailTerm,
+    searchLoginTerm: req.query.searchLoginTerm,
   };
 
   const users = await UserQueryRepository.getAllUsers(sortData);

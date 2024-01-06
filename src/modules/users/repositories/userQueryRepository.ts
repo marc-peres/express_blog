@@ -19,7 +19,7 @@ export class UserQueryRepository {
 
     if (searchLoginTerm || searchEmailTerm) {
       filter = {
-        $and: [
+        $or: [
           searchLoginTerm
             ? {
                 login: {
