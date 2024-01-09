@@ -1,12 +1,10 @@
 import { BlogBdType, PostBdType, UsersBdType } from './models/db';
-import dotenv from 'dotenv';
 import { MongoClient } from 'mongodb';
+import { envVariables } from '../common/env';
 
-dotenv.config();
+const port = envVariables.port;
 
-const port = process.env.PORT;
-
-const uri = process.env.MONGO_URI || process.env.MONGO_LOCAL_URI;
+const uri = envVariables.mongoDevDbUri || envVariables.mongoLocalDbUri;
 
 if (!uri) {
   throw new Error('! incorrect URI');

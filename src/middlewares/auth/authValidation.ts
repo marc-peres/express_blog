@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import dotenv from 'dotenv';
 import { HTTP_STATUSES } from '../../common/models';
+import { envVariables } from '../../common/env';
 
-dotenv.config();
 export const authValidation = (req: Request, res: Response, next: NextFunction) => {
   const auth = req.headers['authorization'];
 
@@ -21,11 +20,11 @@ export const authValidation = (req: Request, res: Response, next: NextFunction) 
   const decodeAuth = Buffer.from(token, 'base64').toString();
   const [login, password] = decodeAuth.split(':');
 
-  if (!process.env.AUTH_LOGIN || !process.env.AUTH_PASSWORD) {
+  if (!envVariables.basicAuthLogin || !envVariables.basicAuthPassword) {
     throw new Error(` ! AUTH_PASSWORD or AUTH_LOGIN doesn't found`);
   }
 
-  if (login !== process.env.AUTH_LOGIN || password !== process.env.AUTH_PASSWORD) {
+  if (login !== envVariables.basicAuthLogin || password !== envVariables.basicAuthPassword) {
     res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
     return;
   }
