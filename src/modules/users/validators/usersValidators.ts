@@ -1,4 +1,4 @@
-import { authValidation } from '../../../middlewares/auth/authValidation';
+import { basicAuthMiddleware } from '../../../middlewares/auth/basicAuthMiddleware';
 import { formattedErrorsValidation } from '../../../common/validators';
 import { body } from 'express-validator';
 
@@ -17,6 +17,12 @@ export const emailValidation = body('email')
   .matches(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/)
   .withMessage('Invalid email!');
 
-export const postUserValidation = () => [authValidation, loginValidation, passwordValidation, emailValidation, formattedErrorsValidation];
+export const postUserValidation = () => [
+  basicAuthMiddleware,
+  loginValidation,
+  passwordValidation,
+  emailValidation,
+  formattedErrorsValidation,
+];
 
-export const queryUsersValidator = () => [authValidation, formattedErrorsValidation];
+export const queryUsersValidator = () => [basicAuthMiddleware, formattedErrorsValidation];

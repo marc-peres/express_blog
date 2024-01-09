@@ -3,7 +3,7 @@ import { PostItemOutputType, PostPaginationOutputType } from '../models/output';
 import { postMapper } from '../mappers/postMapper';
 import { postsCollection } from '../../../db/db';
 import { Filter, ObjectId } from 'mongodb';
-import { PostBdType } from '../../../db/models/db';
+import { PostDbType } from '../../../db/models/db';
 
 export class PostQueryRepository {
   static async getAllPosts(sortData: InputPostQueryType): Promise<PostPaginationOutputType> {
@@ -47,7 +47,7 @@ export class PostQueryRepository {
     return postMapper(post);
   }
 
-  static async getTotalPostsCount(filter: Filter<PostBdType>): Promise<number> {
+  static async getTotalPostsCount(filter: Filter<PostDbType>): Promise<number> {
     return await postsCollection.countDocuments(filter);
   }
 }

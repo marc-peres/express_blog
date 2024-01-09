@@ -1,10 +1,10 @@
 import { InputPostUsersWithPasswordHashType } from '../models/input';
 import { usersCollection } from '../../../db/db';
-import { UsersBdType } from '../../../db/models/db';
+import { UsersDbType } from '../../../db/models/db';
 import { DeleteResult, InsertOneResult, ObjectId } from 'mongodb';
 
 export class UserRepository {
-  static async createUser(createData: InputPostUsersWithPasswordHashType): Promise<InsertOneResult<UsersBdType>> {
+  static async createUser(createData: InputPostUsersWithPasswordHashType): Promise<InsertOneResult<UsersDbType>> {
     return await usersCollection.insertOne(createData);
   }
 

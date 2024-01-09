@@ -1,13 +1,13 @@
 import { blogsCollection } from '../../../db/db';
 import { DeleteResult, InsertOneResult, ObjectId, OptionalId, UpdateResult } from 'mongodb';
 import { InputCreateBlogType } from '../models/input';
-import { BlogBdType } from '../../../db/models/db';
+import { BlogDbType } from '../../../db/models/db';
 export class BlogRepository {
-  static async createNewBlog(newBlog: OptionalId<BlogBdType>): Promise<InsertOneResult<BlogBdType>> {
+  static async createNewBlog(newBlog: OptionalId<BlogDbType>): Promise<InsertOneResult<BlogDbType>> {
     return await blogsCollection.insertOne(newBlog);
   }
 
-  static async updateBlog(id: ObjectId, updateData: InputCreateBlogType): Promise<UpdateResult<BlogBdType>> {
+  static async updateBlog(id: ObjectId, updateData: InputCreateBlogType): Promise<UpdateResult<BlogDbType>> {
     return await blogsCollection.updateOne(
       { _id: id },
       {

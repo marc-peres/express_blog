@@ -6,7 +6,7 @@ import { MongoClient } from 'mongodb';
 import { envVariables } from '../../src/common/env';
 
 const testingPath = '/blogs';
-const mongoURI = envVariables.mongoLocalDbUri;
+const mongoURI = envVariables.MONGO_LOCAL_DB_URI;
 describe('blogs api tests', () => {
   const client = new MongoClient(mongoURI);
 

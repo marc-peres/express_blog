@@ -1,14 +1,14 @@
 import { postsCollection } from '../../../db/db';
 import { InputCreatePostType } from '../models/input';
 import { DeleteResult, InsertOneResult, ObjectId, OptionalId, UpdateResult } from 'mongodb';
-import { PostBdType } from '../../../db/models/db';
+import { PostDbType } from '../../../db/models/db';
 
 export class PostRepository {
-  static async createNewPost(newPost: OptionalId<PostBdType>): Promise<InsertOneResult<PostBdType>> {
+  static async createNewPost(newPost: OptionalId<PostDbType>): Promise<InsertOneResult<PostDbType>> {
     return await postsCollection.insertOne(newPost);
   }
 
-  static async changePost(id: ObjectId, updatedPost: InputCreatePostType): Promise<UpdateResult<PostBdType>> {
+  static async changePost(id: ObjectId, updatedPost: InputCreatePostType): Promise<UpdateResult<PostDbType>> {
     return await postsCollection.updateOne(
       { _id: id },
       {

@@ -1,8 +1,8 @@
 import { Filter, SortDirection } from 'mongodb';
-import { PostBdType } from '../../../db/models/db';
+import { PostDbType } from '../../../db/models/db';
 
 export type GetAllPostsWithFilterSort = {
-  filter?: Filter<PostBdType>;
+  filter?: Filter<PostDbType>;
   sortBy?: string;
   sortDirection?: SortDirection;
   skipCount: number;

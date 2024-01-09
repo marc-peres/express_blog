@@ -6,7 +6,7 @@ import {
   RequestWithParamsAndBodyType,
   RequestWithQueryType,
 } from '../../../common/models';
-import { authValidation } from '../../../middlewares/auth/authValidation';
+import { basicAuthMiddleware } from '../../../middlewares/auth/basicAuthMiddleware';
 import { createPostValidation } from '../validators/postsValidator';
 import { InputCreatePostType, InputPostQueryType } from '../models/input';
 import { ObjectId } from 'mongodb';
@@ -78,7 +78,7 @@ postsRoute.put(
   },
 );
 
-postsRoute.delete('/:id', authValidation, async (req: Request, res: Response) => {
+postsRoute.delete('/:id', basicAuthMiddleware, async (req: Request, res: Response) => {
   const id = req.params.id;
 
   if (!ObjectId.isValid(id)) {

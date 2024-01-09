@@ -5,6 +5,7 @@ import { postsRoute } from './modules/posts';
 import { testingRoute } from './modules/testing';
 import { userRoute } from './modules/users';
 import { authRoute } from './modules/auth/routes/authRoutes';
+import { commentsRoute } from './modules/comments/routes/commentsRoutes';
 
 export const app = express();
 
@@ -15,4 +16,5 @@ app.use('/blogs', blogRoute);
 app.use('/posts', postsRoute);
 app.use('/users', userRoute);
 app.use('/auth', authRoute);
+app.use('/comments', commentsRoute);
 app.use('/testing', testingRoute);

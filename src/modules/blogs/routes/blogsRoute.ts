@@ -6,7 +6,7 @@ import {
   RequestWithParamsAndBodyType,
   RequestWithQueryType,
 } from '../../../common/models';
-import { authValidation } from '../../../middlewares/auth/authValidation';
+import { basicAuthMiddleware } from '../../../middlewares/auth/basicAuthMiddleware';
 import { BlogIdParamType, InputBlogWithQueryType, InputCreateBlogType, InputCreatePostByBlogIdType } from '../models/input';
 import { ObjectId } from 'mongodb';
 import { blogPostValidation, CreatePostByBlogIdValidation } from '../validators/blogValidator';
@@ -124,7 +124,7 @@ blogRoute.delete('/all-blogs', async (req: Request, res: Response) => {
   result ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204) : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
 });
 
-blogRoute.delete('/:id', authValidation, async (req: Request, res: Response) => {
+blogRoute.delete('/:id', basicAuthMiddleware, async (req: Request, res: Response) => {
   const id = req.params.id;
   if (!ObjectId.isValid(id)) {
     res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
