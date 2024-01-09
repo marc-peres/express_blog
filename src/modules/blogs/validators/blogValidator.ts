@@ -1,5 +1,5 @@
 import { body } from 'express-validator';
-import { authValidation } from '../../../middlewares/auth/authValidation';
+import { basicAuthMiddleware } from '../../../middlewares/auth/basicAuthMiddleware';
 import { formattedErrorsValidation } from '../../../common/validators';
 import { postContentValidation, postShortDescriptionValidation, postTitleValidation } from '../../posts';
 
@@ -17,7 +17,7 @@ export const websiteUrlValidation = body('websiteUrl')
   .withMessage('Invalid websiteUrl!');
 
 export const blogPostValidation = () => [
-  authValidation,
+  basicAuthMiddleware,
   nameValidation,
   descriptionValidation,
   websiteUrlValidation,
@@ -25,7 +25,7 @@ export const blogPostValidation = () => [
 ];
 
 export const CreatePostByBlogIdValidation = () => [
-  authValidation,
+  basicAuthMiddleware,
   postTitleValidation,
   postShortDescriptionValidation,
   postContentValidation,

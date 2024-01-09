@@ -1,11 +1,11 @@
-export type BlogBdType = {
+export type BlogDbType = {
   name: string;
   description: string;
   websiteUrl: string;
   createdAt: string;
   isMembership: boolean;
 };
-export type PostBdType = {
+export type PostDbType = {
   title: string;
   shortDescription: string;
   content: string;
@@ -13,7 +13,7 @@ export type PostBdType = {
   blogName: string;
   createdAt: string;
 };
-export type UsersBdType = {
+export type UsersDbType = {
   login: string;
   email: string;
   createdAt: string;

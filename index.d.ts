@@ -1,7 +1,10 @@
+import { UsersDbType } from './src/db/models/db';
+import { WithId } from 'mongodb';
+
 declare global {
   namespace Express {
     export interface Request {
-      userId: string | null;
+      user: WithId<UsersDbType> | null;
     }
   }
 }

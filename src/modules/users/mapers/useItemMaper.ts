@@ -1,8 +1,8 @@
 import { WithId } from 'mongodb';
-import { UsersBdType } from '../../../db/models/db';
+import { UsersDbType } from '../../../db/models/db';
 import { UserItemOutputType } from '../models/output';
 
-export const useItemMapper = (user: WithId<UsersBdType>): UserItemOutputType => {
+export const useItemMapper = (user: WithId<UsersDbType>): UserItemOutputType => {
   return {
     id: user._id.toString(),
     email: user.email,

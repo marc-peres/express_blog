@@ -5,7 +5,7 @@ import { HTTP_STATUSES } from '../../src/common/models';
 import { headersTestConfig } from '../config';
 import { envVariables } from '../../src/common/env';
 
-const mongoURI = envVariables.mongoLocalDbUri;
+const mongoURI = envVariables.MONGO_LOCAL_DB_URI;
 describe('testing getting post by blogId', () => {
   const client = new MongoClient(mongoURI);
 

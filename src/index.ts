@@ -1,9 +1,8 @@
-import dotenv from 'dotenv';
 import { app } from './setting';
 import { runDb } from './db/db';
+import { envVariables } from './common/env';
 
-dotenv.config();
-const port = process.env.PORT;
+const port = envVariables.PORT;
 
 app.listen(port, async () => {
   await runDb();

@@ -2,7 +2,7 @@ import { InputUsersWithQueryType } from '../models/input';
 import { UserPaginationOutputType } from '../models/output';
 import { usersCollection } from '../../../db/db';
 import { Filter, WithId } from 'mongodb';
-import { UsersBdType } from '../../../db/models/db';
+import { UsersDbType } from '../../../db/models/db';
 import { useItemMapper } from '../mapers/useItemMaper';
 
 export class UserQueryRepository {
@@ -53,11 +53,11 @@ export class UserQueryRepository {
     };
   }
 
-  static async getTotalUsersCount(filter?: Filter<UsersBdType>): Promise<number> {
+  static async getTotalUsersCount(filter?: Filter<UsersDbType>): Promise<number> {
     return await usersCollection.countDocuments(filter);
   }
 
-  static async findUserByFilter(filter: Filter<UsersBdType>): Promise<WithId<UsersBdType> | null> {
+  static async findUserByFilter(filter: Filter<UsersDbType>): Promise<WithId<UsersDbType> | null> {
     return await usersCollection.findOne(filter);
   }
 }

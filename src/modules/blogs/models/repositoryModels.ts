@@ -1,8 +1,8 @@
 import { Filter, SortDirection } from 'mongodb';
-import { BlogBdType } from '../../../db/models/db';
+import { BlogDbType } from '../../../db/models/db';
 
 export type GetAllBlogsWithFilterSortAndPagination = {
-  filter?: Filter<BlogBdType>;
+  filter?: Filter<BlogDbType>;
   sortBy?: string;
   sortDirection?: SortDirection;
   skipCount: number;

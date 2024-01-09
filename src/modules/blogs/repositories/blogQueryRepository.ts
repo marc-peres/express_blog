@@ -3,7 +3,7 @@ import { BlogItemOutputType, BlogPaginationOutputType } from '../models/output';
 import { blogMapper } from '../mappers/mapper';
 import { blogsCollection } from '../../../db/db';
 import { Filter, ObjectId } from 'mongodb';
-import { BlogBdType } from '../../../db/models/db';
+import { BlogDbType } from '../../../db/models/db';
 
 export class BlogQueryRepository {
   static async getAllBlogs(sortData: InputBlogWithQueryType): Promise<BlogPaginationOutputType> {
@@ -49,7 +49,7 @@ export class BlogQueryRepository {
     return blogMapper(blog);
   }
 
-  static async getTotalBlogsCount(filter?: Filter<BlogBdType>): Promise<number> {
+  static async getTotalBlogsCount(filter?: Filter<BlogDbType>): Promise<number> {
     return await blogsCollection.countDocuments(filter);
   }
 }

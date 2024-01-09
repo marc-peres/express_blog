@@ -1,5 +1,5 @@
 import { body } from 'express-validator';
-import { authValidation } from '../../../middlewares/auth/authValidation';
+import { basicAuthMiddleware } from '../../../middlewares/auth/basicAuthMiddleware';
 import { ObjectId } from 'mongodb';
 import { formattedErrorsValidation } from '../../../common/validators';
 import { BlogQueryRepository } from '../../blogs/repositories/blogQueryRepository';
@@ -30,7 +30,7 @@ export const postBlogIdValidation = body('blogId')
   .withMessage('Invalid blogId!');
 
 export const createPostValidation = () => [
-  authValidation,
+  basicAuthMiddleware,
   postTitleValidation,
   postShortDescriptionValidation,
   postContentValidation,
