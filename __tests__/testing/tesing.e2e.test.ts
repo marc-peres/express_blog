@@ -2,9 +2,10 @@ import request = require('supertest');
 import { HTTP_STATUSES } from '../../src/common/models';
 import { app } from '../../src/setting';
 import { MongoClient } from 'mongodb';
+import { envVariables } from '../../src/common/env';
 
 const testingPath = '/testing';
-const mongoURI = process.env.MONGO_LOCAL_URI || 'mongodb://localhost:27017';
+const mongoURI = envVariables.mongoLocalDbUri;
 describe('testing api tests', () => {
   const client = new MongoClient(mongoURI);
 

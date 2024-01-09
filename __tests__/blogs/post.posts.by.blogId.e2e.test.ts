@@ -4,8 +4,9 @@ import { app } from '../../src/setting';
 import { MongoClient, ObjectId } from 'mongodb';
 import { headersTestConfig } from '../config';
 import { PostItemOutputType } from '../../src/modules/posts';
+import { envVariables } from '../../src/common/env';
 
-const mongoURI = process.env.MONGO_LOCAL_URI || 'mongodb://localhost:27017';
+const mongoURI = envVariables.mongoLocalDbUri;
 describe('testing getting post by blogId', () => {
   const client = new MongoClient(mongoURI);
   let newBlog: PostItemOutputType;

@@ -3,8 +3,9 @@ import { MongoClient } from 'mongodb';
 import { app } from '../../src/setting';
 import { headersTestConfig } from '../config';
 import { HTTP_STATUSES } from '../../src/common/models';
+import { envVariables } from '../../src/common/env';
 
-const mongoURI = process.env.MONGO_LOCAL_URI || 'mongodb://localhost:27017';
+const mongoURI = envVariables.mongoLocalDbUri;
 describe('testing getting post by blogId', () => {
   const client = new MongoClient(mongoURI);
 

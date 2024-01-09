@@ -3,9 +3,10 @@ import { HTTP_STATUSES } from '../../src/common/models';
 import { headersTestConfig } from '../config';
 import { app } from '../../src/setting';
 import { MongoClient } from 'mongodb';
+import { envVariables } from '../../src/common/env';
 
 const testingPath = '/blogs';
-const mongoURI = process.env.MONGO_LOCAL_URI || 'mongodb://localhost:27017';
+const mongoURI = envVariables.mongoLocalDbUri;
 describe('blogs api tests', () => {
   const client = new MongoClient(mongoURI);
 
