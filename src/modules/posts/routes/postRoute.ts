@@ -14,6 +14,12 @@ import { BlogIdParamType } from '../../blogs';
 import { PostService } from '../service/postService';
 import { PostQueryRepository } from '../repositories/postQueryRepository';
 import { BlogQueryRepository } from '../../blogs/repositories/blogQueryRepository';
+import { RequestWithParamsAndQueryType } from '../../../common/models/comon';
+import { InputCommentsWithQueryType, InputCreateCommentType, PutCommentInputType } from '../../comments/models/input';
+import { CommentsQueryRepository } from '../../comments/repository/commentsQueryRepository';
+import { bearerAuthMiddleware } from '../../../middlewares/auth/bearerAuthMiddleware';
+import { putCommentValidation } from '../../comments/validators/commentValidators';
+import { CommentService } from '../../comments/service/commentService';
 
 export const postsRoute = Router({});
 
@@ -43,6 +49,69 @@ postsRoute.get('/:id', async (req: RequestWithParamsType<BlogIdParamType>, res: 
   }
   res.send(requestedPost);
 });
+
+postsRoute.get('/:id/comments', async (req: RequestWithParamsAndQueryType<BlogIdParamType, InputCommentsWithQueryType>, res: Response) => {
+  const id = req.params.id;
+
+  if (!ObjectId.isValid(id)) {
+    res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
+    return;
+  }
+
+  const requestedPost = await PostQueryRepository.findPostById(id);
+  if (!requestedPost) {
+    res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+    return;
+  }
+
+  const sortData: InputCommentsWithQueryType = {
+    postId: id,
+    pageNumber: req.query.pageNumber,
+    pageSize: req.query.pageSize,
+    sortBy: req.query.sortBy,
+    sortDirection: req.query.sortDirection,
+  };
+
+  const commentsByPostId = await CommentsQueryRepository.getAllComment(sortData);
+
+  res.send(commentsByPostId);
+});
+
+postsRoute.post(
+  '/:id/comments',
+  bearerAuthMiddleware,
+  putCommentValidation(),
+  async (req: RequestWithParamsAndBodyType<BlogIdParamType, PutCommentInputType>, res: Response) => {
+    const id = req.params.id;
+
+    if (!ObjectId.isValid(id)) {
+      res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
+      return;
+    }
+
+    const requestedPost = await PostQueryRepository.findPostById(id);
+    if (!requestedPost) {
+      res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+      return;
+    }
+
+    const { _id, login } = req.user!;
+    const { content } = req.body;
+
+    const commentData: InputCreateCommentType = {
+      content,
+      postId: id,
+      commentatorInfo: {
+        userId: _id.toString(),
+        userLogin: login,
+      },
+    };
+
+    const commentsByPostId = await CommentService.createCommentByPostId(commentData);
+
+    res.status(HTTP_STATUSES.CREATED_201).send(commentsByPostId);
+  },
+);
 
 postsRoute.post('/', createPostValidation(), async (req: RequestWithBodyType<InputCreatePostType>, res: Response) => {
   const { blogId, content, shortDescription, title } = req.body;
@@ -96,7 +165,6 @@ postsRoute.delete('/:id', basicAuthMiddleware, async (req: Request, res: Respons
 });
 
 postsRoute.delete('/all-posts', async (req: Request, res: Response) => {
-  console.log('delete/all-posts');
   await PostService.deleteAllPosts();
   res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
 });
