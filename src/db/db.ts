@@ -1,4 +1,4 @@
-import { BlogDbType, PostDbType, UsersDbType } from './models/db';
+import { BlogDbType, CommentsDbType, PostDbType, UsersDbType } from './models/db';
 import { MongoClient } from 'mongodb';
 import { envVariables } from '../common/env';
 
@@ -15,6 +15,7 @@ export const dataBase = client.db('blogs-hws');
 export const blogsCollection = dataBase.collection<BlogDbType>('blogs');
 export const postsCollection = dataBase.collection<PostDbType>('posts');
 export const usersCollection = dataBase.collection<UsersDbType>('users');
+export const commentsCollection = dataBase.collection<CommentsDbType>('comments');
 
 export const runDb = async () => {
   try {

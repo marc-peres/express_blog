@@ -1,6 +1,6 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
-  moduleFileExtensions: ['jx', 'json', 'ts'],
+  // moduleFileExtensions: ['jx', 'json', 'ts'],
   rootDir: '.',
   preset: 'ts-jest',
   testEnvironment: 'node',
