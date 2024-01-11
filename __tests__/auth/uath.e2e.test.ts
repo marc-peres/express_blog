@@ -1,25 +1,28 @@
-import request = require('supertest');
 import { MongoClient } from 'mongodb';
-import { app } from '../../src/setting';
-import { headersTestConfig } from '../config';
 import { HTTP_STATUSES } from '../../src/common/models';
-import { envVariables } from '../../src/common/env';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { authLoginTestingUtil } from './utils/e2e.authTestingUtils';
+import { createUserTestingUtil, deleteAllUsersTestingUtil } from '../users/utils/e2e.userTestingUtils';
 
-const mongoURI = envVariables.MONGO_LOCAL_DB_URI;
 describe('testing getting post by blogId', () => {
-  const client = new MongoClient(mongoURI);
+  let client: MongoClient;
+  let mongoServer: MongoMemoryServer;
 
   beforeAll(async () => {
+    mongoServer = await MongoMemoryServer.create();
+    const memoryUri = mongoServer.getUri();
+    client = new MongoClient(memoryUri);
     await client.connect();
   });
 
   afterAll(async () => {
-    await request(app).delete(`/users/all-users`).set(headersTestConfig).expect(HTTP_STATUSES.NO_CONTENT_204);
+    await deleteAllUsersTestingUtil();
     await client.close();
+    await mongoServer.stop();
   });
 
   it(`shouldn't authorized and return errors`, async () => {
-    const response = await request(app).post(`/auth/login`).send({ loginOrEmail: '', password: '' }).expect(HTTP_STATUSES.BAD_REQUEST_400);
+    const response = await authLoginTestingUtil({ loginOrEmail: '', password: '' }, HTTP_STATUSES.BAD_REQUEST_400);
     const errorResponse = response.body;
     expect(errorResponse).toEqual({
       errorsMessages: [
@@ -30,32 +33,21 @@ describe('testing getting post by blogId', () => {
   });
 
   it(`shouldn't authorized and return 401`, async () => {
-    await request(app)
-      .post(`/auth/login`)
-      .send({ loginOrEmail: 'loginOrEmail', password: 'password' })
-      .expect(HTTP_STATUSES.UNAUTHORIZED_401);
+    await authLoginTestingUtil({ loginOrEmail: 'loginOrEmail', password: 'password' }, HTTP_STATUSES.UNAUTHORIZED_401);
   });
 
   it(`shouldn't authorized and return errors`, async () => {
-    await request(app)
-      .post(`/users`)
-      .send({
+    await createUserTestingUtil(
+      {
         login: '123',
         password: '123456',
         email: 'test@test.test',
-      })
-      .set(headersTestConfig)
-      .expect(HTTP_STATUSES.CREATED_201);
-
-    await request(app).post(`/auth/login`).send({ loginOrEmail: '123', password: 'wrong' }).expect(HTTP_STATUSES.UNAUTHORIZED_401);
-    await request(app)
-      .post(`/auth/login`)
-      .send({ loginOrEmail: 'test@test.test', password: 'wrong' })
-      .expect(HTTP_STATUSES.UNAUTHORIZED_401);
-    await request(app).post(`/auth/login`).send({ loginOrEmail: '123', password: '123456' }).expect(HTTP_STATUSES.NO_CONTENT_204);
-    await request(app)
-      .post(`/auth/login`)
-      .send({ loginOrEmail: 'test@test.test', password: '123456' })
-      .expect(HTTP_STATUSES.NO_CONTENT_204);
+      },
+      HTTP_STATUSES.CREATED_201,
+    );
+    await authLoginTestingUtil({ loginOrEmail: '123', password: 'wrong' }, HTTP_STATUSES.UNAUTHORIZED_401);
+    await authLoginTestingUtil({ loginOrEmail: 'test@test.test', password: 'wrong' }, HTTP_STATUSES.UNAUTHORIZED_401);
+    await authLoginTestingUtil({ loginOrEmail: '123', password: '123456' }, HTTP_STATUSES.OK_200);
+    await authLoginTestingUtil({ loginOrEmail: 'test@test.test', password: '123456' }, HTTP_STATUSES.OK_200);
   });
 });

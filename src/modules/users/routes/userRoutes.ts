@@ -24,6 +24,11 @@ userRoute.get('/', queryUsersValidator(), async (req: RequestWithQueryType<Input
 
 userRoute.post('/', postUserValidation(), async (req: RequestWithBodyType<InputPostUsersType>, res: Response) => {
   const { login, password, email } = req.body;
+  const searchedUser = await UserQueryRepository.findUserByFilter({ $or: [{ login }, { email }] });
+  if (searchedUser) {
+    res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
+    return;
+  }
   const user = await UserService.createUser({ login, password, email });
   res.status(HTTP_STATUSES.CREATED_201).send(user);
 });
