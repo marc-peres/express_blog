@@ -2,36 +2,41 @@ import request = require('supertest');
 import { HTTP_STATUSES } from '../../src/common/models';
 import { app } from '../../src/setting';
 import { MongoClient, ObjectId } from 'mongodb';
-import { headersTestConfig } from '../config';
 import { PostItemOutputType } from '../../src/modules/posts';
-import { envVariables } from '../../src/common/env';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { deleteAllDbTestingUtil } from '../testing/utils/e2e.testingUtils';
+import { createNewBlogTestingUtil, createPostByBlogIdTestingUtil } from './utils/e2e.blogsTestingUtils';
 
-const mongoURI = envVariables.MONGO_LOCAL_DB_URI;
 describe('testing getting post by blogId', () => {
-  const client = new MongoClient(mongoURI);
   let newBlog: PostItemOutputType;
 
+  let client: MongoClient;
+  let mongoServer: MongoMemoryServer;
+
   beforeAll(async () => {
+    mongoServer = await MongoMemoryServer.create();
+    const memoryUri = mongoServer.getUri();
+    client = new MongoClient(memoryUri);
     await client.connect();
-    const response = await request(app)
-      .post('/blogs')
-      .set(headersTestConfig)
-      .send({ name: 'new post', description: 'new post description', websiteUrl: 'https://post.test' })
-      .expect(HTTP_STATUSES.CREATED_201);
+    await deleteAllDbTestingUtil();
+    const response = await createNewBlogTestingUtil(
+      { name: 'new post', description: 'new post description', websiteUrl: 'https://post.test' },
+      HTTP_STATUSES.CREATED_201,
+    );
     newBlog = response.body;
   });
 
   afterAll(async () => {
-    await request(app).delete(`/blogs/${newBlog.id}`).set(headersTestConfig).expect(HTTP_STATUSES.NO_CONTENT_204);
     await client.close();
+    await mongoServer.stop();
   });
 
   it(`shouldn't create post with incorrect values end return 400`, async () => {
-    const errorResponse = await request(app)
-      .post(`/blogs/${newBlog.id}/posts`)
-      .set(headersTestConfig)
-      .send({ content: '', shortDescription: '', title: '' })
-      .expect(HTTP_STATUSES.BAD_REQUEST_400);
+    const errorResponse = await createPostByBlogIdTestingUtil(
+      newBlog.id,
+      { content: '', shortDescription: '', title: '' },
+      HTTP_STATUSES.BAD_REQUEST_400,
+    );
 
     expect(errorResponse.body).toEqual({
       errorsMessages: [
@@ -59,26 +64,22 @@ describe('testing getting post by blogId', () => {
   });
 
   it(`shouldn't create post with no valid and return 400`, async () => {
-    await request(app)
-      .post(`/blogs/incorrectBlogId/posts`)
-      .set(headersTestConfig)
-      .send({ content: 'content', shortDescription: 'shortDescription', title: 'title' })
-      .expect(HTTP_STATUSES.BAD_REQUEST_400);
+    await createPostByBlogIdTestingUtil('incorrectBlogId', { content: '', shortDescription: '', title: '' }, HTTP_STATUSES.BAD_REQUEST_400);
   });
 
   it(`shouldn't create post with valid and return 404`, async () => {
-    await request(app)
-      .post(`/blogs/${new ObjectId('61d5d505025f7d83c5157c27')}/posts`)
-      .set(headersTestConfig)
-      .send({ content: 'content', shortDescription: 'shortDescription', title: 'title' })
-      .expect(HTTP_STATUSES.NOT_FOUND_404);
+    await createPostByBlogIdTestingUtil(
+      new ObjectId('61d5d505025f7d83c5157c27'),
+      { content: 'content', shortDescription: 'shortDescription', title: 'title' },
+      HTTP_STATUSES.NOT_FOUND_404,
+    );
   });
 
   it(`should create post  and return 201`, async () => {
-    await request(app)
-      .post(`/blogs/${newBlog.id}/posts`)
-      .set(headersTestConfig)
-      .send({ content: 'content', shortDescription: 'shortDescription', title: 'title' })
-      .expect(HTTP_STATUSES.CREATED_201);
+    await createPostByBlogIdTestingUtil(
+      newBlog.id,
+      { content: 'content', shortDescription: 'shortDescription', title: 'title' },
+      HTTP_STATUSES.CREATED_201,
+    );
   });
 });

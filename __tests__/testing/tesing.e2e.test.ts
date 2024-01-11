@@ -2,23 +2,27 @@ import request = require('supertest');
 import { HTTP_STATUSES } from '../../src/common/models';
 import { app } from '../../src/setting';
 import { MongoClient } from 'mongodb';
-import { envVariables } from '../../src/common/env';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { deleteAllDbTestingUtil } from './utils/e2e.testingUtils';
 
-const testingPath = '/testing';
-const mongoURI = envVariables.MONGO_LOCAL_DB_URI;
 describe('testing api tests', () => {
-  const client = new MongoClient(mongoURI);
+  let client: MongoClient;
+  let mongoServer: MongoMemoryServer;
 
   beforeAll(async () => {
+    mongoServer = await MongoMemoryServer.create();
+    const memoryUri = mongoServer.getUri();
+    client = new MongoClient(memoryUri);
     await client.connect();
   });
 
   afterAll(async () => {
     await client.close();
+    await mongoServer.stop();
   });
 
   it('should delete all data', async () => {
-    await request(app).delete(`${testingPath}/all-data`).expect(HTTP_STATUSES.NO_CONTENT_204);
+    await deleteAllDbTestingUtil();
     const postsResponse = await request(app).get('/posts').expect(HTTP_STATUSES.OK_200);
     const blogsResponse = await request(app).get('/blogs').expect(HTTP_STATUSES.OK_200);
     const postsList = postsResponse.body.items;
