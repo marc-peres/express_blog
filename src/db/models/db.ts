@@ -19,6 +19,11 @@ export type UsersDbType = {
   createdAt: string;
   passwordSalt: string;
   passwordHash: string;
+  emailConfirmation: {
+    confirmationCode: string | null;
+    expirationDate: Date | null;
+    isConfirmed: boolean;
+  };
 };
 export type CommentsDbType = {
   content: string;

@@ -29,12 +29,14 @@ userRoute.post('/', postUserValidation(), async (req: RequestWithBodyType<InputP
     res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
     return;
   }
-  const user = await UserService.createUser({ login, password, email });
-  res.status(HTTP_STATUSES.CREATED_201).send(user);
+  const user = await UserService.createConfirmedUser({ login, password, email });
+  user ? res.status(HTTP_STATUSES.CREATED_201).send(user) : res.status(HTTP_STATUSES.BAD_REQUEST_400);
+  return;
 });
 userRoute.delete('/all-users', queryUsersValidator(), async (req: Request, res: Response) => {
   const result = await UserService.deleteAllUser();
   result ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204) : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+  return;
 });
 
 userRoute.delete('/:id', queryUsersValidator(), async (req: RequestWithParamsType<UserIdParamType>, res: Response) => {
@@ -46,4 +48,5 @@ userRoute.delete('/:id', queryUsersValidator(), async (req: RequestWithParamsTyp
 
   const result = await UserService.deleteUserById(id);
   result ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204) : res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+  return;
 });
