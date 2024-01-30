@@ -4,6 +4,8 @@ import { UsersDbType } from '../../../db/models/db';
 import { UserService } from '../../users/service/userService';
 import { emailManager } from '../../../utils/managers/emailManager';
 import { v4 as uuidv4 } from 'uuid';
+import { JwtService } from '../../../application/services/jwtService';
+import { AuthQueryRepository } from '../repository/authQueryRepository';
 
 export class AuthService {
   static async checkCredentials(login: string, password: string): Promise<WithId<UsersDbType> | null> {
@@ -37,6 +39,50 @@ export class AuthService {
       return true;
     } catch (e) {
       console.log('sendEmailRecoveryMessageError', e);
+      return false;
+    }
+  }
+
+  static async refreshTokens(oldRefreshToken: string): Promise<{ accessToken: string; refreshToken: string } | null> {
+    try {
+      const result = await JwtService.getUserInfoByToken(oldRefreshToken, 'refresh');
+      if (!result) {
+        return null;
+      }
+      const { userId, email, login } = result;
+      const blackList = await AuthQueryRepository.findTokenInBlackList({ expiredToken: oldRefreshToken });
+      if (blackList?._id) {
+        return null;
+      } else {
+        const createdAt = new Date();
+        await AuthQueryRepository.addRefreshTokenToBlackList({
+          expiredToken: oldRefreshToken,
+          createdAt: createdAt.toISOString(),
+        });
+      }
+      return await JwtService.createJWT(userId!, email, login);
+    } catch (e) {
+      console.log('refreshTokensReq', e);
+      return null;
+    }
+  }
+
+  static async logOut(oldRefreshToken: string): Promise<boolean> {
+    try {
+      const result = await JwtService.getUserInfoByToken(oldRefreshToken, 'refresh');
+      if (!result) {
+        return false;
+      }
+      const blackList = await AuthQueryRepository.findTokenInBlackList({ expiredToken: oldRefreshToken });
+      if (blackList?._id) {
+        return false;
+      } else {
+        const createdAt = new Date();
+        await AuthQueryRepository.addRefreshTokenToBlackList({ expiredToken: oldRefreshToken, createdAt: createdAt.toISOString() });
+      }
+      return true;
+    } catch (e) {
+      console.log('logOutReq', e);
       return false;
     }
   }
