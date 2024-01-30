@@ -6,10 +6,12 @@ import { testingRoute } from './modules/testing';
 import { userRoute } from './modules/users';
 import { authRoute } from './modules/auth/routes/authRoutes';
 import { commentsRoute } from './modules/comments/routes/commentsRoutes';
+import cookieParser from 'cookie-parser';
 
 export const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use('/', homeRoute);
 app.use('/blogs', blogRoute);

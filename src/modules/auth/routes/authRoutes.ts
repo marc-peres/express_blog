@@ -11,7 +11,6 @@ import { AuthService } from '../service/authService';
 import { bearerAuthMiddleware } from '../../../middlewares/auth/bearerAuthMiddleware';
 import { JwtService } from '../../../application/services/jwtService';
 import { authRepository } from '../repository/authRepository';
-
 export const authRoute = Router({});
 
 authRoute.post('/login', postAuthLoginValidation(), async (req: RequestWithBodyType<InputLoginAuthType>, res: Response) => {
@@ -22,9 +21,39 @@ authRoute.post('/login', postAuthLoginValidation(), async (req: RequestWithBodyT
     res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
     return;
   }
-  const tokenJWT = await JwtService.createJWT(user!);
-  res.send(tokenJWT);
+  const { refreshToken, accessToken } = await JwtService.createJWT(user._id, user.email, user.login);
+  res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+  res.send({ accessToken });
 });
+
+authRoute.post('/refresh-token', async (req: Request, res: Response) => {
+  const oldRefreshToken = req.cookies.refreshToken;
+
+  if (!oldRefreshToken) {
+    res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
+    return;
+  }
+  const result = await AuthService.refreshTokens(oldRefreshToken);
+
+  if (!result) {
+    res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
+    return;
+  }
+  const { refreshToken, accessToken } = result;
+  res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+  res.send({ accessToken });
+});
+
+authRoute.post('/logout', async (req: Request, res: Response) => {
+  const cookieRefreshToken = req.cookies.refreshToken;
+  if (!cookieRefreshToken) {
+    res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
+    return;
+  }
+  const result = await AuthService.logOut(cookieRefreshToken);
+  result ? res.sendStatus(HTTP_STATUSES.NO_CONTENT_204) : res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
+});
+
 authRoute.post(
   '/registration',
   postAuthRegistrationValidation(),
@@ -56,6 +85,11 @@ authRoute.post(
 );
 
 authRoute.get('/me', bearerAuthMiddleware, async (req: Request, res: Response) => {
-  const user = req.user!;
-  res.send({ email: user.email, login: user.login, userId: user._id });
+  const auth = req.headers['authorization'];
+  const [, token] = auth!.split(' ');
+  const result = await JwtService.getUserInfoByToken(token, 'access');
+
+  result
+    ? res.send({ email: result.email, login: result.login, userId: result.userId.toString() })
+    : res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401);
 });

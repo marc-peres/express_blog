@@ -33,3 +33,7 @@ export type CommentsDbType = {
   };
   createdAt: string;
 };
+export type ExpiredTokenType = {
+  createdAt: string;
+  expiredToken: string;
+};

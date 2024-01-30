@@ -1,4 +1,4 @@
-import { BlogDbType, CommentsDbType, PostDbType, UsersDbType } from './models/db';
+import { BlogDbType, CommentsDbType, ExpiredTokenType, PostDbType, UsersDbType } from './models/db';
 import { MongoClient } from 'mongodb';
 import { envVariables } from '../common/env';
 
@@ -16,6 +16,7 @@ export const blogsCollection = dataBase.collection<BlogDbType>('blogs');
 export const postsCollection = dataBase.collection<PostDbType>('posts');
 export const usersCollection = dataBase.collection<UsersDbType>('users');
 export const commentsCollection = dataBase.collection<CommentsDbType>('comments');
+export const expiredTokenCollection = dataBase.collection<ExpiredTokenType>('expiredToken');
 
 export const runDb = async () => {
   try {
